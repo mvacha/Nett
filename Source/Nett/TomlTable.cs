@@ -102,12 +102,14 @@ namespace Nett
                 return val;
             }
 
+#pragma warning disable CA1033 // The setter his hidden for a reason in this case, derived types also should not use it
             set
             {
                 this.AssertIntegrity();
                 this.CheckNotFrozen();
                 this.rows[key] = this.EnsureCorrectRoot(value);
             }
+#pragma warning restore CA1033
         }
 
         public TomlObject this[string key]

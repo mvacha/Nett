@@ -4,6 +4,9 @@ using Nett.Util;
 
 using static System.Diagnostics.Debug;
 
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable, because TomlWriter uses writer but doesn't own it
+#pragma warning disable CA2213 // Disposable field should be disposed, again TomlWriter doesn't own the reader
+
 namespace Nett.Writer
 {
     internal abstract class TomlWriter

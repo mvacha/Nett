@@ -2,6 +2,9 @@
 using System.Text;
 using Nett.Parser.Matchers;
 
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable, because Tokenizer uses the reader, but doesn't own it
+#pragma warning disable CA2213 // Disposable field should be disposed, again Tokenizer doesn't own the reader
+
 namespace Nett.Parser
 {
     internal sealed class Tokenizer
