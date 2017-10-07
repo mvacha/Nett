@@ -1,18 +1,18 @@
-﻿namespace Nett
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using Nett.Collections;
+using Nett.Extensions;
+using static System.Diagnostics.Debug;
+
+namespace Nett
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Reflection;
-    using Extensions;
-
-    using static System.Diagnostics.Debug;
-
     public partial class TomlTable : TomlObject, IDictionary<string, TomlObject>
     {
-        private readonly Dictionary<TomlKey, TomlObject> rows = new Dictionary<TomlKey, TomlObject>();
+        private readonly OrderedDictionary<TomlKey, TomlObject> rows = new OrderedDictionary<TomlKey, TomlObject>();
 
         private volatile bool isFrozen = false;
 
