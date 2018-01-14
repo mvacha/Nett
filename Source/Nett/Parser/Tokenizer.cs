@@ -12,6 +12,7 @@
         private readonly StreamReader reader;
         private readonly TokenBuffer tokens;
 
+
         public Tokenizer(Stream sr)
         {
             this.reader = new StreamReader(sr);
@@ -59,6 +60,8 @@
 
         private Token? NextToken()
         {
+            StringBuilder whitespace = new StringBuilder(32);
+
             if (this.characters.End) { return this.CreateEof(); }
 
             while (!this.characters.End && this.characters.TryExpectWhitespace())
@@ -71,12 +74,15 @@
                 if (c == '\r' && this.characters.TryExpect('\n'))
                 {
                     this.characters.Consume();
-                    return Token.NewLine(lineBeforeConsume, colBeforeConsume);
+                    return Token.NewLine(lineBeforeConsume, colBeforeConsume, whitespace.ToString());
                 }
-
-                if (c == '\n')
+                else if (c == '\n')
                 {
-                    return Token.NewLine(lineBeforeConsume, colBeforeConsume);
+                    return Token.NewLine(lineBeforeConsume, colBeforeConsume, whitespace.ToString());
+                }
+                else
+                {
+                    whitespace.Append(c);
                 }
             }
 
@@ -95,14 +101,20 @@
 
             if (token != null)
             {
-                return new Token(token.Value.type, token.Value.value) { line = lineAtFirstTokenChar, col = colAtFirstTokenChar };
+                return new Token(token.Value.type, token.Value.value)
+                {
+                    line = lineAtFirstTokenChar,
+                    col = colAtFirstTokenChar,
+                    whitespace = whitespace.ToString(),
+                };
             }
             else
             {
                 return new Token(TokenType.Unknown, this.characters.ConsumeTillWhitespaceOrEnd())
                 {
                     line = lineAtFirstTokenChar,
-                    col = colAtFirstTokenChar
+                    col = colAtFirstTokenChar,
+                    whitespace = whitespace.ToString(),
                 };
             }
         }

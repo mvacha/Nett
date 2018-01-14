@@ -331,16 +331,19 @@ namespace Nett.Tests.Internal.Parser
         [Fact]
         public void TokenizeKeyValuePair()
         {
-            var t = new Tokenizer("   key =   1929  ".ToStream());
+            var t = new Tokenizer("   key =\t   1929  ".ToStream());
 
             t.Tokens.PeekAt(0).type.Should().Be(TokenType.BareKey);
             t.Tokens.PeekAt(0).value.Should().Be("key");
+            t.Tokens.PeekAt(0).whitespace.Should().Be("   ");
 
             t.Tokens.PeekAt(1).type.Should().Be(TokenType.Assign);
             t.Tokens.PeekAt(1).value.Should().Be("=");
+            t.Tokens.PeekAt(1).whitespace.Should().Be(" ");
 
             t.Tokens.PeekAt(2).type.Should().Be(TokenType.Integer);
             t.Tokens.PeekAt(2).value.Should().Be("1929");
+            t.Tokens.PeekAt(2).whitespace.Should().Be("\t   ");
         }
 
         [Fact]
