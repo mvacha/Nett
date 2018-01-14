@@ -1,6 +1,7 @@
 ﻿namespace Nett.Parser
 {
     using System;
+    using System.Linq;
 
     internal sealed class TokenBuffer : LookaheadBuffer<Token>
     {
@@ -13,9 +14,12 @@
 
         public override bool End => this.Peek().type == TokenType.Eof || base.End;
 
-        public void ConsumeAllNewlines()
+        public string ConsumeAllNewlines()
         {
-            while (this.Peek().type == TokenType.NewLine) { this.Consume(); }
+            int nlc = 0;
+            for (nlc = 0; this.Peek().type == TokenType.NewLine; nlc++) { this.Consume(); }
+
+            return string.Join(string.Empty, Enumerable.Repeat(Environment.NewLine, nlc));
         }
 
         public Token Expect(TokenType tt)

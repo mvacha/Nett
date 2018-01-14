@@ -1,4 +1,5 @@
-﻿using Nett.Tests.Util;
+﻿using FluentAssertions;
+using Nett.Tests.Util;
 
 namespace Nett.Tests.Functional
 {
@@ -10,6 +11,45 @@ namespace Nett.Tests.Functional
         {
             [TomlComment("Originally defined comment.")]
             public int X { get; set; } = 2;
+        }
+
+        public class WhitespaceConfig
+        {
+            public int X { get; set; } = 200;
+
+            public int Y { get; set; } = 400;
+
+            public const string Default = @"
+
+    # This is Y
+Y = 0
+
+
+
+# X follows
+
+   X  =     1
+
+
+
+";
+        }
+
+        [FFact(FuncWriteMerged, "When append comment is written, writes that comment with correct formatting")]
+        public void WriteMerged_When()
+        {
+            // Arrange
+            const string tgt = @"x = 1         # This comment has quite some spaces in between";
+            var tbl = Toml.Create();
+            tbl.Add("x", 2);
+
+            // Act
+            var result = Toml.WriteStringMerged(tbl, tgt);
+
+            // Assert
+            result.Should().Be(@"x = 2         # This comment has quite some spaces in between
+");
+
         }
 
         [FFact(FuncWriteMerged, "When merge target comment was changed, leaves comment intact but updates value")]
@@ -28,7 +68,22 @@ X = 1
 
             // Assert
             newToml.ShouldBeSemanticallyEquivalentTo(expected);
+        }
 
+        [FFact(FuncWriteMerged, "When merge target contains custom whitespace, it stays intact when new values are saved.")]
+        public void XXX()
+        {
+            // Arrange
+            var c = new WhitespaceConfig();
+            string expected = WhitespaceConfig.Default
+                .Replace("0", $"{c.Y}")
+                .Replace("1", $"{c.X}");
+
+            // Act
+            var newToml = Toml.WriteStringMerged(new WhitespaceConfig(), WhitespaceConfig.Default);
+
+            // Assert
+            newToml.Should().Be(expected);
         }
     }
 }

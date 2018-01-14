@@ -1,4 +1,6 @@
-﻿using Nett.Extensions;
+﻿using System.Globalization;
+using Nett.Extensions;
+using Nett.Parser;
 
 namespace Nett
 {
@@ -16,6 +18,15 @@ namespace Nett
         public override void Visit(ITomlObjectVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        internal static TomlFloat FromToken(ITomlRoot root, Token token)
+        {
+            double value = double.Parse(token.value.Replace("_", string.Empty), CultureInfo.InvariantCulture);
+            return new TomlFloat(root, value)
+            {
+                ParseInfo = ParsingInfo.CreateFromToken(token),
+            };
         }
 
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneFloatFor(root);

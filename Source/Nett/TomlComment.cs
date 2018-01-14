@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Nett.Parser;
 
 namespace Nett
 {
@@ -16,6 +17,8 @@ namespace Nett
 
         public string Text { get; }
 
+        internal ParsingInfo ParseInfo { get; private set; } = ParsingInfo.NotAvailable;
+
         private string DebuggerDisplay
         {
             get
@@ -23,6 +26,14 @@ namespace Nett
                 var prefix = this.Location == CommentLocation.Prepend ? "P" : "A";
                 return $"{prefix} #{this.Text}";
             }
+        }
+
+        internal static TomlComment FromToken(Token token, CommentLocation location)
+        {
+            return new TomlComment(token.value, location)
+            {
+                ParseInfo = ParsingInfo.CreateFromToken(token),
+            };
         }
 
         public override bool Equals(object obj) => this.Equals(obj as TomlComment);

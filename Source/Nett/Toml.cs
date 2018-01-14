@@ -226,7 +226,7 @@
             var preserved = TomlTable.Combine(op => op
                 .Overwrite(srcTable).With(newTable).ExcludingComments().ForAllSourceRows());
 
-            return WriteStringInternal(preserved);
+            return WriteStringInternalWithParsedFormatting(preserved);
         }
 
         private static void WriteFileInternal(TomlTable table, string filePath, TomlSettings settings)
@@ -262,6 +262,19 @@
             {
                 var sw = new FormattingStreamWriter(ms, CultureInfo.InvariantCulture);
                 var writer = new TomlTableWriter(sw, table.Root.Settings);
+                writer.WriteToml(table);
+                ms.Position = 0;
+                StreamReader sr = new StreamReader(ms);
+                return sr.ReadToEnd();
+            }
+        }
+
+        private static string WriteStringInternalWithParsedFormatting(TomlTable table)
+        {
+            using (var ms = new MemoryStream(1024))
+            {
+                var sw = new FormattingStreamWriter(ms, CultureInfo.InvariantCulture);
+                var writer = new ParseInfoTomlTableWriter(sw, table.Root.Settings);
                 writer.WriteToml(table);
                 ms.Position = 0;
                 StreamReader sr = new StreamReader(ms);

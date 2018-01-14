@@ -8,7 +8,8 @@
         {
             var key = KeyProduction.Apply(tokens);
 
-            tokens.ExpectAndConsume(TokenType.Assign);
+            var assignment = tokens.ExpectAndConsume(TokenType.Assign);
+            key.AssignmentParseInfo = ParsingInfo.CreateFromToken(assignment);
 
             var inlineTableArray = InlineTableArrayProduction.TryApply(root, tokens);
             if (inlineTableArray != null)

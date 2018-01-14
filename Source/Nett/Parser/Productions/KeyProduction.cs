@@ -8,17 +8,19 @@
 
         private static TomlKey ApplyInternal(TokenBuffer tokens, bool required)
         {
+            var tkn = tokens.Peek();
+
             if (tokens.TryExpect(TokenType.BareKey) || tokens.TryExpect(TokenType.Integer))
             {
-                return new TomlKey(tokens.Consume().value, TomlKey.KeyType.Bare);
+                return CreateKey(tokens.Consume(), TomlKey.KeyType.Bare);
             }
             else if (tokens.TryExpect(TokenType.String))
             {
-                return new TomlKey(tokens.Consume().value, TomlKey.KeyType.Basic);
+                return CreateKey(tokens.Consume(), TomlKey.KeyType.Basic);
             }
             else if (tokens.TryExpect(TokenType.LiteralString))
             {
-                return new TomlKey(tokens.Consume().value, TomlKey.KeyType.Literal);
+                return CreateKey(tokens.Consume(), TomlKey.KeyType.Literal);
             }
             else if (required)
             {
@@ -36,6 +38,16 @@
             {
                 return new TomlKey(string.Empty);
             }
+        }
+
+        private static TomlKey CreateKey(Token tkn, TomlKey.KeyType type)
+        {
+            var key = new TomlKey(tkn.value, type)
+            {
+                ParseInfo = ParsingInfo.CreateFromToken(tkn)
+            };
+
+            return key;
         }
     }
 }

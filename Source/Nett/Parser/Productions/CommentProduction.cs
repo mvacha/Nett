@@ -9,7 +9,7 @@
             var comments = new List<TomlComment>();
             while (tokens.TryExpect(TokenType.Comment) && tokens.Peek().line == lastExpressionToken.line)
             {
-                comments.Add(new TomlComment(tokens.Consume().value, CommentLocation.Append));
+                comments.Add(TomlComment.FromToken(tokens.Consume(), CommentLocation.Append));
             }
 
             return comments;
@@ -20,7 +20,7 @@
             var comments = new List<TomlComment>();
             while (tokens.TryExpect(TokenType.Comment))
             {
-                comments.Add(new TomlComment(tokens.Consume().value, location));
+                comments.Add(TomlComment.FromToken(tokens.Consume(), location));
                 tokens.ConsumeAllNewlines();
             }
 

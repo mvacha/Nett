@@ -37,6 +37,8 @@
 
         internal ITomlRoot Root { get; }
 
+        internal ParsingInfo ParseInfo { get; set; } = ParsingInfo.NotAvailable;
+
         public TomlObject AddComment(TomlComment comment)
         {
             this.comments.Add(comment);

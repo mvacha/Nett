@@ -7,16 +7,23 @@ namespace Nett
         public readonly string Value;
         public KeyType Type;
 
+        internal ParsingInfo ParseInfo;
+        internal ParsingInfo AssignmentParseInfo;
+
         public TomlKey(string s)
         {
             this.Type = AutoClassify(s);
             this.Value = s;
+            this.ParseInfo = ParsingInfo.NotAvailable;
+            this.AssignmentParseInfo = ParsingInfo.NotAvailable;
         }
 
         public TomlKey(string key, KeyType type)
         {
             this.Value = key;
             this.Type = type;
+            this.ParseInfo = ParsingInfo.NotAvailable;
+            this.AssignmentParseInfo = ParsingInfo.NotAvailable;
         }
 
         public enum KeyType

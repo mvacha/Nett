@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Functional\ParseFormatInfoTests.cs" />
     <Compile Include="NestedTableViaConverterTests.cs" />
     <Compile Include="Parser\LaBufferTests.cs" />
     <Compile Include="Parser\TokenizerTests.cs" />

@@ -223,7 +223,7 @@
                 throw new Exception($"Failed to parse TOML float with '{floatToken.value}' because it has  a leading '0' which is not allowed by the TOML specification.");
             }
 
-            return new TomlFloat(root, double.Parse(floatToken.value.Replace("_", string.Empty), CultureInfo.InvariantCulture));
+            return TomlFloat.FromToken(root, floatToken);
         }
 
         private static TomlInt ParseTomlInt(ITomlRoot root, LookaheadBuffer<Token> tokens)
@@ -235,7 +235,7 @@
                 throw new Exception($"Failed to parse TOML int with '{token.value}' because it has  a leading '0' which is not allowed by the TOML specification.");
             }
 
-            return new TomlInt(root, long.Parse(token.value.Replace("_", string.Empty)));
+            return TomlInt.FromToken(root, token);
         }
 
         private static TomlValue ParseTomlValue(ITomlRoot root, TokenBuffer tokens)

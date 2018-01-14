@@ -1,4 +1,5 @@
 ﻿using Nett.Extensions;
+using Nett.Parser;
 
 namespace Nett
 {
@@ -16,6 +17,15 @@ namespace Nett
         public override void Visit(ITomlObjectVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        internal static TomlInt FromToken(ITomlRoot root, Token token)
+        {
+            long value = long.Parse(token.value.Replace("_", string.Empty));
+            return new TomlInt(root, value)
+            {
+                ParseInfo = ParsingInfo.CreateFromToken(token)
+            };
         }
 
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneIntFor(root);
