@@ -34,7 +34,7 @@
             var comments = new List<TomlComment>();
             while (tokens.TryExpect(TokenType.Comment))
             {
-                comments.Add(new TomlComment(tokens.Consume().value, CommentLocation.Prepend));
+                comments.Add(TomlComment.FromToken(tokens.Consume(), CommentLocation.Prepend));
                 tokens.ConsumeAllNewlines();
             }
 

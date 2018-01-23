@@ -52,6 +52,27 @@ Y = 0
 
         }
 
+
+        [FFact(FuncWriteMerged, "When prepend comment is written, writes that comment with target formatting")]
+        public void WriteMerged_WhenPrependCommentIsWritten_WritesThatCommentWithTargetFormatting()
+        {
+            // Arrange
+            const string WS = "        ";
+            string tgt = $@"{WS}# This comment has quite some spaces
+x = 1";
+            var tbl = Toml.Create();
+            tbl.Add("x", 2);
+
+            // Act
+            var result = Toml.WriteStringMerged(tbl, tgt);
+
+            // Assert
+            result.Should().Be($@"{WS}# This comment has quite some spaces
+x = 2
+");
+
+        }
+
         [FFact(FuncWriteMerged, "When merge target comment was changed, leaves comment intact but updates value")]
         public void WriteMerged_WhenCommentInMergeTargetWasChanged_UpdatesValueButLeavesCommentIntact()
         {

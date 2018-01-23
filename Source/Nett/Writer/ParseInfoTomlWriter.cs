@@ -64,7 +64,7 @@ namespace Nett.Writer
             var prepend = obj.Comments.Where((c) => this.settings.GetCommentLocation(c) == TomlCommentLocation.Prepend);
             foreach (var p in prepend)
             {
-                this.writer.Write(this.settings.GetIndentString(level));
+                this.writer.Write(p.ParseInfo.Whitespace);
                 this.writer.Write('#');
                 this.writer.Write(FixMultilineComment(p.Text));
                 this.writer.WriteLine();
