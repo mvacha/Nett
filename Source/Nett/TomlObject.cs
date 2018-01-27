@@ -74,10 +74,11 @@
 
         internal abstract TomlObject WithRoot(ITomlRoot root);
 
-        protected static T CopyComments<T>(T dst, TomlObject src)
+        protected static T CopyMeta<T>(T dst, TomlObject src)
             where T : TomlObject
         {
             dst.comments.AddRange(src.comments);
+            dst.ParseInfo = src.ParseInfo;
             return dst;
         }
     }

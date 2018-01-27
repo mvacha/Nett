@@ -61,7 +61,7 @@ namespace Nett
 
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneStringFor(root);
 
-        internal TomlString CloneStringFor(ITomlRoot root) => CopyComments(new TomlString(root, this.Value), this);
+        internal TomlString CloneStringFor(ITomlRoot root) => CopyMeta(new TomlString(root, this.Value), this);
 
         internal override TomlValue ValueWithRoot(ITomlRoot root) => this.StringWithRoot(root);
 

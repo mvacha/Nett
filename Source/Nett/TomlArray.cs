@@ -77,7 +77,7 @@
         {
             var copy = new TomlValue[this.Value.Length];
             this.Value.CopyTo(copy, 0);
-            return CopyComments(new TomlArray(root, copy), this);
+            return CopyMeta(new TomlArray(root, copy), this);
         }
 
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneArrayFor(root);

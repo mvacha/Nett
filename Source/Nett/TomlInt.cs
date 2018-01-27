@@ -30,7 +30,7 @@ namespace Nett
 
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneIntFor(root);
 
-        internal TomlInt CloneIntFor(ITomlRoot root) => CopyComments(new TomlInt(root, this.Value), this);
+        internal TomlInt CloneIntFor(ITomlRoot root) => CopyMeta(new TomlInt(root, this.Value), this);
 
         internal override TomlValue ValueWithRoot(ITomlRoot root) => this.IntWithRoot(root);
 

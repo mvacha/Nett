@@ -62,7 +62,7 @@ namespace Nett.Writer
             else
             {
                 this.writer.Write(kvp.Key.AssignmentParseInfo.Whitespace);
-                this.writer.Write("= ");
+                this.writer.Write("=");
             }
 
             this.WriteValue(kvp.Value);
@@ -83,6 +83,8 @@ namespace Nett.Writer
 
         private void WriteValue(TomlObject obj)
         {
+            this.writer.Write(obj.ParseInfo.Whitespace);
+
             switch (obj.TomlType)
             {
                 case TomlObjectType.Bool: this.writer.Write(((TomlBool)obj).Value.ToString().ToLower()); break;

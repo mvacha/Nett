@@ -35,7 +35,7 @@
             return new TomlDateTime(root, value);
         }
 
-        internal TomlDateTime CloneDateTimeFor(ITomlRoot root) => CopyComments(new TomlDateTime(root, this.Value), this);
+        internal TomlDateTime CloneDateTimeFor(ITomlRoot root) => CopyMeta(new TomlDateTime(root, this.Value), this);
 
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneDateTimeFor(root);
 

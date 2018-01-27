@@ -93,7 +93,7 @@
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneArrayFor(root);
 
         internal TomlTableArray CloneArrayFor(ITomlRoot root)
-            => CopyComments(new TomlTableArray(root, this.items.Select(i => i.CloneTableFor(root))), this);
+            => CopyMeta(new TomlTableArray(root, this.items.Select(i => i.CloneTableFor(root))), this);
 
         internal override TomlObject WithRoot(ITomlRoot root) => this.TableArrayWithRoot(root);
 

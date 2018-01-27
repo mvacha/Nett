@@ -31,7 +31,7 @@ namespace Nett
 
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneFloatFor(root);
 
-        internal TomlFloat CloneFloatFor(ITomlRoot root) => CopyComments(new TomlFloat(root, this.Value), this);
+        internal TomlFloat CloneFloatFor(ITomlRoot root) => CopyMeta(new TomlFloat(root, this.Value), this);
 
         internal override TomlValue ValueWithRoot(ITomlRoot root) => this.FloatWithRoot(root);
 

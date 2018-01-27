@@ -73,5 +73,19 @@ x = 1";
             k.AssignmentParseInfo.Whitespace.Should().Be(WS);
         }
 
+        [Fact]
+        public void WhenWhitespaceBetwennAssignmentAndValue_ParseInfoHasSameWhitesapce()
+        {
+            // Arrange
+            // Arrange
+            string WS = $"    ";
+            string tml = $@"x={WS}1";
+
+            // Act
+            var tbl = Toml.ReadString(tml);
+
+            // Assert
+            tbl["x"].ParseInfo.Whitespace.Should().Be(WS);
+        }
     }
 }

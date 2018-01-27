@@ -263,7 +263,9 @@ namespace Nett
 
                 foreach (var r in this.source.rows)
                 {
-                    combineResult.rows[r.Key] = this.CloneWithComments(r.Key, r.Value, combineResult.Root);
+                    var cloned = this.CloneWithComments(r.Key, r.Value, combineResult.Root);
+                    if (combineResult.InternalRows.TryGetValue(r.Key, out var tgtRow)) { cloned.ParseInfo = tgtRow.ParseInfo; }
+                    combineResult.rows[r.Key] = cloned;
                 }
 
                 return combineResult;

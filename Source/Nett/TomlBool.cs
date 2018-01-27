@@ -19,7 +19,7 @@ namespace Nett
             visitor.Visit(this);
         }
 
-        internal TomlBool CloneBoolFor(ITomlRoot root) => CopyComments(new TomlBool(root, this.Value), this);
+        internal TomlBool CloneBoolFor(ITomlRoot root) => CopyMeta(new TomlBool(root, this.Value), this);
 
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneBoolFor(root);
 

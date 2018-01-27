@@ -29,6 +29,19 @@ namespace Nett.Tests.Functional
         }
 
         [Fact]
+        public void WhenThereIsWhitespaceBetweenAssignmentAndValue_OutputHasSameWhitespace()
+        {
+            // Arrange
+            (var fmtSrc, var expected) = FormatX(@"X =        {0}");
+
+            // Act
+            var written = Toml.WriteFormatted(newX, fmtSrc);
+
+            // Assert
+            written.Should().Be(expected);
+        }
+
+        [Fact]
         public void WhenThereIsWhitesapceInFrontOfAPrependComment_OutputHasTheSameWhitespace()
         {
             // Arrange
