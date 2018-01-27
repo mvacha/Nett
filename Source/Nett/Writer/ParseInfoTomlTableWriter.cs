@@ -18,7 +18,6 @@ namespace Nett.Writer
         {
             const string rootParentKey = "";
             this.WriteTableRows(rootParentKey, table, level: -1);
-            this.writer.WriteLine();
             this.writer.Flush();
         }
 

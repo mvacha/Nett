@@ -51,11 +51,20 @@ namespace Nett.Writer
             this.writer.Write(kvp.Key.ParseInfo.Whitespace);
             this.writer.Write(kvp.Key.ToString());
 
-            int spacesToInsert = alignColumn - kvp.Key.Value.Length;
+            if (kvp.Key.AssignmentParseInfo == ParsingInfo.NotAvailable)
+            {
+                int spacesToInsert = alignColumn - kvp.Key.Value.Length;
 
-            for (int i = 0; i < spacesToInsert; i++) { this.writer.Write(" "); }
+                for (int i = 0; i < spacesToInsert; i++) { this.writer.Write(" "); }
 
-            this.writer.Write(" = ");
+                this.writer.Write(" = ");
+            }
+            else
+            {
+                this.writer.Write(kvp.Key.AssignmentParseInfo.Whitespace);
+                this.writer.Write("= ");
+            }
+
             this.WriteValue(kvp.Value);
         }
 

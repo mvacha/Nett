@@ -2,6 +2,7 @@
 using System.Linq;
 using FluentAssertions;
 using Nett.Tests.Util;
+using Xunit;
 
 namespace Nett.Tests.Internal.Functional
 {
@@ -53,6 +54,23 @@ x = 1";
             // Assert
             var kvp = tbl.InternalRows.Where(r => r.Key.Value == "y").Single();
             kvp.Key.ParseInfo.Whitespace.Should().Be(WS);
+        }
+
+        [Fact]
+        public void ReadToml_WithWhitespaceBetwennKeyAndAssignment_CreatesParseInfoWithThatWhitespace()
+        {
+            // Arrange
+            // Arrange
+            string WS = $"    ";
+            string tml = $@"x{WS}= 1";
+
+            // Act
+            var tbl = Toml.ReadString(tml);
+
+            // Assert
+            var k = tbl.InternalRows.Keys.ElementAt(0);
+            k.ParseInfo.Whitespace.Should().Be("");
+            k.AssignmentParseInfo.Whitespace.Should().Be(WS);
         }
 
     }
