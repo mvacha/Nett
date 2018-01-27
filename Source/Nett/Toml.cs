@@ -217,11 +217,11 @@
         /// </summary>
         /// <typeparam name="T">The type of the object to serialize.</typeparam>
         /// <param name="obj">The object instance to serialize.</param>
-        /// <param name="mergeTarget">TOML content of an already serialized instance of <typeparamref name="T"/>.</param>
-        /// <returns>Serialized instance of T with formatting and comments of <paramref name="mergeTarget"/>.</returns>
-        public static string WriteStringMerged<T>(T obj, string mergeTarget)
+        /// <param name="formattingSource">TOML content of an already serialized instance of <typeparamref name="T"/>.</param>
+        /// <returns>Serialized instance of T with formatting and comments of <paramref name="formattingSource"/>.</returns>
+        public static string WriteFormatted<T>(T obj, string formattingSource)
         {
-            var srcTable = Toml.ReadString(mergeTarget);
+            var srcTable = Toml.ReadString(formattingSource);
             var newTable = TomlTable.RootTable.From(TomlSettings.DefaultInstance, Toml.Create(obj));
             var preserved = TomlTable.Combine(op => op
                 .Overwrite(srcTable).With(newTable).ExcludingComments().ForAllSourceRows());

@@ -87,6 +87,11 @@
             return object.Equals(laVal, expected);
         }
 
+        protected ref T RefPeek()
+        {
+            return ref this.buffer[this.readIndex];
+        }
+
         private void IncIndex(ref int index)
         {
             if (++index > this.buffer.Length - 1)

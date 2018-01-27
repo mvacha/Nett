@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Nett.Tests.Util;
+using Xunit;
 
 namespace Nett.Tests.Functional
 {
@@ -7,7 +8,7 @@ namespace Nett.Tests.Functional
     {
         private const string FuncWriteMerged = "Write Merged";
 
-        public class Config
+        public class XYConfig
         {
             [TomlComment("Originally defined comment.")]
             public int X { get; set; } = 2;
@@ -44,7 +45,7 @@ Y = 0
             tbl.Add("x", 2);
 
             // Act
-            var result = Toml.WriteStringMerged(tbl, tgt);
+            var result = Toml.WriteFormatted(tbl, tgt);
 
             // Assert
             result.Should().Be(@"x = 2         # This comment has quite some spaces in between
@@ -64,7 +65,7 @@ x = 1";
             tbl.Add("x", 2);
 
             // Act
-            var result = Toml.WriteStringMerged(tbl, tgt);
+            var result = Toml.WriteFormatted(tbl, tgt);
 
             // Assert
             result.Should().Be($@"{WS}# This comment has quite some spaces
@@ -81,11 +82,11 @@ x = 2
 # This comment was changed by a user in the file
 X = 1
 ";
-            var c = new Config();
+            var c = new XYConfig();
             string expected = src.Replace("= 1", $"= {c.X}");
 
             // Act
-            var newToml = Toml.WriteStringMerged(new Config(), src);
+            var newToml = Toml.WriteFormatted(new XYConfig(), src);
 
             // Assert
             newToml.ShouldBeSemanticallyEquivalentTo(expected);
@@ -101,7 +102,26 @@ X = 1
                 .Replace("1", $"{c.X}");
 
             // Act
-            var newToml = Toml.WriteStringMerged(new WhitespaceConfig(), WhitespaceConfig.Default);
+            var newToml = Toml.WriteFormatted(new WhitespaceConfig(), WhitespaceConfig.Default);
+
+            // Assert
+            newToml.Should().Be(expected);
+        }
+
+        [Fact]
+        public void WriteMerged_WhenFmtSrcRowsHaveMultipleNewlineBetweenThem_NewlyWrittenAlsoHasThem()
+        {
+            // Arrange
+            const string src = @"X = 1
+
+
+Y = 2
+";
+            var c = new XYConfig();
+            string expected = src.Replace("= 1", $"= {c.X}");
+
+            // Act
+            var newToml = Toml.WriteFormatted(new XYConfig(), src);
 
             // Assert
             newToml.Should().Be(expected);

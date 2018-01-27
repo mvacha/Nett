@@ -71,11 +71,6 @@ namespace Nett.Writer
 
         private void WriteTableRow(string parentKey, KeyValuePair<TomlKey, TomlObject> r, int rowIndex, int alignColumn, int level)
         {
-            if (rowIndex > 0)
-            {
-                this.writer.WriteLine();
-            }
-
             if (r.Value.TomlType == TomlObjectType.Array)
             {
                 this.WriteTomlArrayWithComments(r.Key, (TomlArray)r.Value, level);

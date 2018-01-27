@@ -14,12 +14,19 @@
 
         public override bool End => this.Peek().type == TokenType.Eof || base.End;
 
-        public string ConsumeAllNewlines()
+        public void ConsumeAllNewlines()
         {
             int nlc = 0;
             for (nlc = 0; this.Peek().type == TokenType.NewLine; nlc++) { this.Consume(); }
 
-            return string.Join(string.Empty, Enumerable.Repeat(Environment.NewLine, nlc));
+            AttachNewlinesToNextToken();
+
+            void AttachNewlinesToNextToken()
+            {
+                ref Token nextToken = ref this.RefPeek();
+                nextToken.whitespace = string.Join(string.Empty, Enumerable.Repeat(Environment.NewLine, nlc))
+                    + nextToken.whitespace;
+            }
         }
 
         public Token Expect(TokenType tt)

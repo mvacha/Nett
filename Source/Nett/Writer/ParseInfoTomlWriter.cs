@@ -48,7 +48,7 @@ namespace Nett.Writer
 
         protected void WriteKeyedValue(KeyValuePair<TomlKey, TomlObject> kvp, int alignColumn, int level)
         {
-            this.writer.Write(this.settings.GetIndentString(level));
+            this.writer.Write(kvp.Key.ParseInfo.Whitespace);
             this.writer.Write(kvp.Key.ToString());
 
             int spacesToInsert = alignColumn - kvp.Key.Value.Length;
@@ -67,7 +67,6 @@ namespace Nett.Writer
                 this.writer.Write(p.ParseInfo.Whitespace);
                 this.writer.Write('#');
                 this.writer.Write(FixMultilineComment(p.Text));
-                this.writer.WriteLine();
             }
         }
 
