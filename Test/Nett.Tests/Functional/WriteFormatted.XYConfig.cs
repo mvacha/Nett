@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Nett.Tests.Functional
 {
-    public partial class WriteFormatted
+    public partial class WriteFormattedTests
     {
         private static readonly XYConfig srcXY = new XYConfig() { X = 1, Y = 2 };
         private static readonly XYConfig newXY = new XYConfig() { X = 11, Y = 22 };

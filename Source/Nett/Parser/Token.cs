@@ -65,7 +65,7 @@
             return new Token(TokenType.Unknown, fragment.ToString());
         }
 
-        public static Token NewLine(int line, int col, string whitespace) 
+        public static Token NewLine(int line, int col, string whitespace)
             => new Token(TokenType.NewLine, "<NewLine>") { line = line, col = col, whitespace = whitespace };
 
         public static Token EndOfFile(int line, int col) => new Token(TokenType.Eof, "<EndOfFile>") { line = line, col = col };

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Nett.Tests.Functional
 {
-    public partial class WriteFormatted
+    public partial class WriteFormattedTests
     {
         private static readonly XConfig srcX = new XConfig() { X = 1 };
         private static readonly XConfig newX = new XConfig() { X = 11 };
@@ -40,6 +40,18 @@ namespace Nett.Tests.Functional
             // Assert
             written.Should().Be(expected);
         }
+
+        public class TestS
+        {
+            public int X;
+
+            public string Meta;
+
+            public override bool Equals(object obj) => this.X == ((TestS)obj).X;
+
+            public override int GetHashCode() => this.X;
+        }
+
 
         [Fact]
         public void WhenThereIsWhitesapceInFrontOfAPrependComment_OutputHasTheSameWhitespace()

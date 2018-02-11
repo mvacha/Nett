@@ -7,6 +7,7 @@ namespace Nett
         public readonly string Value;
         public KeyType Type;
 
+        // Parse Info is 'Meta' data => does not modify the 'value'. It is allowed to modify these in a mutable way.
         internal ParsingInfo ParseInfo;
         internal ParsingInfo AssignmentParseInfo;
 

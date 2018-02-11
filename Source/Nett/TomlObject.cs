@@ -74,6 +74,11 @@
 
         internal abstract TomlObject WithRoot(ITomlRoot root);
 
+        internal virtual void UseParseInfoFrom(TomlObject y)
+        {
+            this.ParseInfo = y.ParseInfo;
+        }
+
         protected static T CopyMeta<T>(T dst, TomlObject src)
             where T : TomlObject
         {

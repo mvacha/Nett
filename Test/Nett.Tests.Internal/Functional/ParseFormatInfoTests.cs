@@ -68,7 +68,7 @@ x = 1";
             var tbl = Toml.ReadString(tml);
 
             // Assert
-            var k = tbl.InternalRows.Keys.ElementAt(0);
+            var k = tbl.InternalRows.Select(r => r.Key).ElementAt(0);
             k.ParseInfo.Whitespace.Should().Be("");
             k.AssignmentParseInfo.Whitespace.Should().Be(WS);
         }

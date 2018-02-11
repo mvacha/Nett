@@ -16,6 +16,8 @@
 
         internal sealed class RootTable : TomlTable, ITomlRoot
         {
+            internal ParsingInfo EofParseInfo;
+
             private readonly TomlSettings settings;
 
             public RootTable(TomlSettings settings)

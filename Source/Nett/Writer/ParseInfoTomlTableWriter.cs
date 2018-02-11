@@ -18,6 +18,10 @@ namespace Nett.Writer
         {
             const string rootParentKey = "";
             this.WriteTableRows(rootParentKey, table, level: -1);
+
+            var root = (TomlTable.RootTable)table.Root;
+            this.writer.Write(root.EofParseInfo.Whitespace);
+
             this.writer.Flush();
         }
 
@@ -25,13 +29,6 @@ namespace Nett.Writer
 
         private static bool IsInlineTomlTableArray(TomlTableArray a)
             => a.Items.Any(t => t.TableType == TomlTable.TableTypes.Inline);
-
-        private void WriteKeyedValueWithComments(KeyValuePair<TomlKey, TomlObject> row, int alignColumn, int level)
-        {
-            this.WritePrependComments(row.Value, level);
-            this.WriteKeyedValue(row, alignColumn, level);
-            this.WriteAppendComments(row.Value);
-        }
 
         private void WriteNormalTomlTable(string parentKey, TomlKey key, TomlTable table, int level)
         {
@@ -61,18 +58,21 @@ namespace Nett.Writer
             }
         }
 
-        private void WriteTomlArrayWithComments(TomlKey key, TomlArray array, int level)
+        private void WriteKey(TomlKey key)
         {
-            this.WritePrependComments(array, level);
-            this.WriteArray(key, array);
-            this.WriteAppendComments(array);
+            this.writer.Write(key.ParseInfo.Whitespace);
+            this.writer.Write(key.Value);
+            this.writer.Write(key.AssignmentParseInfo.Whitespace);
+            this.writer.Write("=");
         }
 
         private void WriteTableRow(string parentKey, KeyValuePair<TomlKey, TomlObject> r, int rowIndex, int alignColumn, int level)
         {
+            this.WritePrependComments(r.Value, level);
+            this.WriteKey(r.Key);
             if (r.Value.TomlType == TomlObjectType.Array)
             {
-                this.WriteTomlArrayWithComments(r.Key, (TomlArray)r.Value, level);
+                this.WriteArray((TomlArray)r.Value);
             }
             else if (r.Value.TomlType == TomlObjectType.Table)
             {
@@ -82,7 +82,8 @@ namespace Nett.Writer
             {
                 this.WriteTomlTableArray(parentKey, r.Key, (TomlTableArray)r.Value, level + 1);
             }
-            else { this.WriteKeyedValueWithComments(r, alignColumn, level); }
+            else { this.WriteValue((TomlValue)r.Value); }
+            this.WriteAppendComments(r.Value);
         }
 
         private void WriteTableRows(string parentKey, TomlTable table, int level)

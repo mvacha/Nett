@@ -71,9 +71,11 @@ namespace Nett.Writer
 
             private void WriteTableRow(KeyValuePair<TomlKey, TomlObject> r)
             {
+                this.WriteKey(r.Key);
+
                 if (r.Value.TomlType == TomlObjectType.Array)
                 {
-                    this.WriteArray(r.Key, (TomlArray)r.Value);
+                    this.WriteArray((TomlArray)r.Value);
                 }
                 else if (r.Value.TomlType == TomlObjectType.Table)
                 {
@@ -85,8 +87,13 @@ namespace Nett.Writer
                 }
                 else
                 {
-                    this.WriteKeyedValue(r, alignColumn: 0, level: 0);
+                    this.WriteValue((TomlValue)r.Value);
                 }
+            }
+
+            private void WriteKey(TomlKey key)
+            {
+
             }
         }
     }

@@ -226,6 +226,8 @@
             var preserved = TomlTable.Combine(op => op
                 .Overwrite(srcTable).With(newTable).ExcludingComments().ForAllSourceRows());
 
+            TableWalker.Walk(newTable, srcTable, (x, y) => x.UseParseInfoFrom(y), null);
+
             return WriteStringInternalWithParsedFormatting(preserved);
         }
 

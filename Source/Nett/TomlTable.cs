@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using Nett.Collections;
 using Nett.Extensions;
 using static System.Diagnostics.Debug;
@@ -318,7 +317,7 @@ namespace Nett
 
         protected virtual void OnRowValueSet(string rowKey)
         {
-        } 
+        }
 
         private static bool ScopeCreatingType(TomlObject obj) =>
             obj.TomlType == TomlObjectType.Table || obj.TomlType == TomlObjectType.ArrayOfTables;

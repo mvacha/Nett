@@ -1,22 +1,28 @@
 ﻿using FluentAssertions;
-using Nett.Tests.Util;
+using Xunit;
 
 namespace Nett.Tests.Functional
 {
-    public partial class WriteFormatted
+    public partial class WriteFormattedTests
     {
         private const string FuncWriteMerged = "Write Merged";
 
         public class WhitespaceConfig
         {
-            public int X { get; set; } = 200;
+            public int X { get; set; } = 10;
 
-            public int Y { get; set; } = 400;
+            public int Y { get; set; } = 20;
+
+            public int Z { get; set; } = 30;
+
+            public int[] W { get; set; } = new int[] { 40, 40, 40 };
 
             public const string Default = @"
 
+Z = 3 # But the user moved Z to the first position
+
     # This is Y
-Y = 0
+Y = 2
 
 
 
@@ -24,19 +30,28 @@ Y = 0
 
    X  =     1
 
+      W      = [
+         4,
+             4,
+                 4,
 
+
+
+      ]
 
 ";
         }
 
-        [FFact(FuncWriteMerged, "When merge target contains custom whitespace, it stays intact when new values are saved.")]
-        public void XXX()
+        [Fact]
+        public void WriteMerged_WhenMergeTargetContainsCustomWhitespace_WhitespaceIsKeptOnSave()
         {
             // Arrange
             var c = new WhitespaceConfig();
             string expected = WhitespaceConfig.Default
-                .Replace("0", $"{c.Y}")
-                .Replace("1", $"{c.X}");
+                .Replace("1", $"{c.X}")
+                .Replace("2", $"{c.Y}")
+                .Replace("3", $"{c.Z}")
+                .Replace("4", $"{c.W[0]}");
 
             // Act
             var newToml = Toml.WriteFormatted(new WhitespaceConfig(), WhitespaceConfig.Default);

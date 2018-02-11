@@ -92,5 +92,16 @@
 
             return new TomlArray(root, this.Items.Select(i => i.ValueWithRoot(root)).ToArray());
         }
+
+        internal override void UseParseInfoFrom(TomlObject y)
+        {
+            base.UseParseInfoFrom(y);
+
+            var ya = (TomlArray)y;
+            for (int i = 0; i < this.Items.Length && i < ya.Items.Length; i++)
+            {
+                this.Value[i].UseParseInfoFrom(ya.Value[i]);
+            }
+        }
     }
 }

@@ -87,6 +87,8 @@
     <Compile Include="Functional\WriteFormatted.cs" />
     <Compile Include="Functional\ReadInWriteOutTests.cs" />
     <Compile Include="Functional\InlineTableTests.Write.cs" />
+    <Compile Include="Functional\WriteFormattedTests.Array.cs" />
+    <Compile Include="Functional\WriteFormattedTests.WhitespaceOnly.cs" />
     <Compile Include="Functional\WriteNewFormattingTests.cs" />
     <Compile Include="Plugins\DictRootConfig.cs" />
     <Compile Include="Plugins\ObjRootConfig.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Unit\TomlTableTests.cs" />
     <Compile Include="Unit\TomlTests.cs" />
     <Compile Include="VerifyIssuesTests.cs" />
+    <Compile Include="WriteFormattted.WhitespaceOnly.cs" />
     <Compile Include="WriteTomlFileTests.cs" />
     <Compile Include="WriteTomlTests.cs" />
     <Compile Include="WriteTomlTypesTests.cs" />
