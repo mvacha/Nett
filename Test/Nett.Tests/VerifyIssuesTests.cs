@@ -236,9 +236,9 @@ second1 = ""x""
 second2 = ""y""
 second3 = ""z""
 
-[Level2.Level3]
-third1 = ""a""
-third2 = ""b""".Trim());
+    [Level2.Level3]
+    third1 = ""a""
+    third2 = ""b""".Trim());
         }
 
         public class WithUint

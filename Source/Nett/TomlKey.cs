@@ -27,14 +27,6 @@ namespace Nett
             this.AssignmentParseInfo = ParsingInfo.NotAvailable;
         }
 
-        public enum KeyType
-        {
-            Undefined,
-            Bare,
-            Basic,
-            Literal,
-        }
-
         public static bool operator ==(TomlKey x, TomlKey y) => x.Value == y.Value;
 
         public static bool operator !=(TomlKey x, TomlKey y) => !(x == y);

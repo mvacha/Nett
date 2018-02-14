@@ -11,7 +11,8 @@ namespace Nett
 {
     public partial class TomlTable : TomlObject, IDictionary<string, TomlObject>
     {
-        private readonly OrderedDictionary<TomlKey, TomlObject> rows = new OrderedDictionary<TomlKey, TomlObject>();
+        private readonly OrderedDictionary<string, TomlObject> rows = new OrderedDictionary<string, TomlObject>();
+        private readonly Dictionary<string, KeyMetaInfo> keyMeta = new Dictionary<string, KeyMetaInfo>();
 
         private volatile bool isFrozen = false;
 
@@ -31,7 +32,7 @@ namespace Nett
 
         public bool IsReadOnly => this.isFrozen;
 
-        public ICollection<string> Keys => this.rows.Keys.Select(k => k.Value).ToList();
+        public ICollection<string> Keys => this.rows.Keys;
 
         public override string ReadableTypeName => "table";
 
@@ -39,9 +40,8 @@ namespace Nett
         {
             get
             {
-                var all = this.rows.Select(kvp => new KeyValuePair<string, TomlObject>(kvp.Key.Value, kvp.Value));
-                var nonscoping = all.Where(kvp => !ScopeCreatingType(kvp.Value));
-                var scoping = all.Where(kvp => ScopeCreatingType(kvp.Value));
+                var nonscoping = this.rows.Where(kvp => !ScopeCreatingType(kvp.Value));
+                var scoping = this.rows.Where(kvp => ScopeCreatingType(kvp.Value));
                 return nonscoping.Concat(scoping);
             }
         }
@@ -58,9 +58,22 @@ namespace Nett
         {
             get
             {
-                var nonscoping = this.rows.Where(kvp => !ScopeCreatingType(kvp.Value));
-                var scoping = this.rows.Where(kvp => ScopeCreatingType(kvp.Value));
+                var all = this.rows.Select(r => CreateInternalRow(r));
+                var nonscoping = all.Where(kvp => !ScopeCreatingType(kvp.Value));
+                var scoping = all.Where(kvp => ScopeCreatingType(kvp.Value));
                 return nonscoping.Concat(scoping);
+
+                KeyValuePair<TomlKey, TomlObject> CreateInternalRow(KeyValuePair<string, TomlObject> r)
+                {
+                    if (this.keyMeta.TryGetValue(r.Key, out var meta))
+                    {
+                        return new KeyValuePair<TomlKey, TomlObject>(new TomlKey(r.Key, meta.KeyType), r.Value);
+                    }
+                    else
+                    {
+                        return new KeyValuePair<TomlKey, TomlObject>(new TomlKey(r.Key), r.Value);
+                    }
+                }
             }
         }
 
@@ -69,7 +82,7 @@ namespace Nett
             get
             {
                 this.AssertIntegrity();
-                if (!this.rows.TryGetValue(new TomlKey(key), out var val))
+                if (!this.rows.TryGetValue(key, out var val))
                 {
                     throw new KeyNotFoundException(string.Format("No row with key '{0}' exists in this TOML table.", key));
                 }
@@ -82,7 +95,7 @@ namespace Nett
                 value = value.Root == this.Root ? value : value.CloneFor(this.Root);
                 this.AssertIntegrity();
                 this.CheckNotFrozen();
-                this.rows[new TomlKey(key)] = this.EnsureCorrectRoot(value);
+                this.rows[key] = this.EnsureCorrectRoot(value);
                 this.OnRowValueSet(key);
             }
         }
@@ -134,10 +147,9 @@ namespace Nett
             this.rows.Clear();
         }
 
-        public bool Contains(KeyValuePair<string, TomlObject> item)
-            => this.rows.Contains(new KeyValuePair<TomlKey, TomlObject>(new TomlKey(item.Key), item.Value));
+        public bool Contains(KeyValuePair<string, TomlObject> item) => this.rows.Contains(item);
 
-        public bool ContainsKey(string key) => this.rows.ContainsKey(new TomlKey(key));
+        public bool ContainsKey(string key) => this.rows.ContainsKey(key);
 
         public void CopyTo(KeyValuePair<string, TomlObject>[] array, int arrayIndex)
         {
@@ -180,10 +192,10 @@ namespace Nett
 
             foreach (var r in this.rows)
             {
-                var targetProperty = this.Root.Settings.TryGetMappingProperty(result.GetType(), r.Key.Value);
+                var targetProperty = this.Root.Settings.TryGetMappingProperty(result.GetType(), r.Key);
                 if (targetProperty != null)
                 {
-                    Type keyMapingTargetType = this.Root.Settings.TryGetMappedType(r.Key.Value, targetProperty);
+                    Type keyMapingTargetType = this.Root.Settings.TryGetMappedType(r.Key, targetProperty);
                     targetProperty.SetValue(result, r.Value.Get(keyMapingTargetType ?? targetProperty.PropertyType), null);
                 }
             }
@@ -191,14 +203,7 @@ namespace Nett
             return result;
         }
 
-        public IEnumerator<KeyValuePair<string, TomlObject>> GetEnumerator()
-        {
-            var iterator = this.rows.GetEnumerator();
-            while (iterator.MoveNext())
-            {
-                yield return new KeyValuePair<string, TomlObject>(iterator.Current.Key.Value, iterator.Current.Value);
-            }
-        }
+        public IEnumerator<KeyValuePair<string, TomlObject>> GetEnumerator() => this.rows.GetEnumerator();
 
         void ICollection<KeyValuePair<string, TomlObject>>.Add(KeyValuePair<string, TomlObject> item)
             => this.AddRow(new TomlKey(item.Key), item.Value);
@@ -211,13 +216,13 @@ namespace Nett
         public bool Remove(string key)
         {
             this.CheckNotFrozen();
-            return this.rows.Remove(new TomlKey(key));
+            return this.rows.Remove(key);
         }
 
         public bool Remove(KeyValuePair<string, TomlObject> item)
         {
             this.CheckNotFrozen();
-            return this.rows.Remove(new TomlKey(item.Key));
+            return this.rows.Remove(item.Key);
         }
 
         public Dictionary<string, object> ToDictionary()
@@ -228,13 +233,11 @@ namespace Nett
 
         public TomlObject TryGetValue(string key)
         {
-            TomlObject o;
-            this.rows.TryGetValue(new TomlKey(key), out o);
+            this.rows.TryGetValue(key, out TomlObject o);
             return o;
         }
 
-        public bool TryGetValue(string key, out TomlObject value)
-            => this.rows.TryGetValue(new TomlKey(key), out value);
+        public bool TryGetValue(string key, out TomlObject value) => this.rows.TryGetValue(key, out value);
 
         public override void Visit(ITomlObjectVisitor visitor)
         {
@@ -254,7 +257,10 @@ namespace Nett
         {
             this.CheckNotFrozen();
             var toAdd = this.EnsureCorrectRoot(value);
-            this.rows.Add(key, toAdd);
+
+            this.rows.Add(key.Value, toAdd);
+            this.keyMeta.Add(key.Value, new KeyMetaInfo(key.Type));
+
             return toAdd;
         }
 
@@ -266,7 +272,12 @@ namespace Nett
 
             foreach (var r in this.rows)
             {
-                tbl.AddRow(r.Key, r.Value.CloneFor(root));
+                tbl.rows.Add(r.Key, r.Value.CloneFor(root));
+            }
+
+            foreach (var r in this.keyMeta)
+            {
+                tbl.keyMeta.Add(r.Key, r.Value);
             }
 
             return tbl;
@@ -294,7 +305,8 @@ namespace Nett
 
         internal void SetRow(TomlKey key, TomlObject value)
         {
-            this.rows[key] = value;
+            this.rows[key.Value] = value;
+            this.keyMeta[key.Value] = new KeyMetaInfo(key.Type);
         }
 
         internal TomlObject TryGetValue(TomlKey key) => this.TryGetValue(key.Value);
@@ -307,7 +319,12 @@ namespace Nett
 
             foreach (var r in this.rows)
             {
-                table.AddRow(r.Key, r.Value.WithRoot(root));
+                table.rows.Add(r.Key, r.Value.WithRoot(root));
+            }
+
+            foreach (var r in this.keyMeta)
+            {
+                table.keyMeta.Add(r.Key, r.Value);
             }
 
             return table;

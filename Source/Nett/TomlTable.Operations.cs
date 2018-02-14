@@ -232,14 +232,14 @@ namespace Nett
 
             public virtual TomlTable Execute() => this.target.CloneTableFor(this.target.Root);
 
-            protected IEnumerable<TomlComment> GetComments(TomlKey k)
+            protected IEnumerable<TomlComment> GetComments(string k)
             {
-                var tgtComments = this.target.TryGetValue(k.Value, out var tgtVal) ? tgtVal.Comments : Empty;
-                var srcComments = this.source.TryGetValue(k.Value, out var srcVal) ? srcVal.Comments : Empty;
+                var tgtComments = this.target.TryGetValue(k, out var tgtVal) ? tgtVal.Comments : Empty;
+                var srcComments = this.source.TryGetValue(k, out var srcVal) ? srcVal.Comments : Empty;
                 return this.commentsOp(new InputComments(tgtComments, srcComments));
             }
 
-            protected TomlObject CloneWithComments(TomlKey key, TomlObject sourceValue, ITomlRoot root)
+            protected TomlObject CloneWithComments(string key, TomlObject sourceValue, ITomlRoot root)
             {
                 var comments = this.GetComments(key);
                 var cloned = sourceValue.CloneFor(root);

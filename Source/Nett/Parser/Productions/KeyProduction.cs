@@ -12,15 +12,15 @@
 
             if (tokens.TryExpect(TokenType.BareKey) || tokens.TryExpect(TokenType.Integer))
             {
-                return CreateKey(tokens.Consume(), TomlKey.KeyType.Bare);
+                return CreateKey(tokens.Consume(), KeyType.Bare);
             }
             else if (tokens.TryExpect(TokenType.String))
             {
-                return CreateKey(tokens.Consume(), TomlKey.KeyType.Basic);
+                return CreateKey(tokens.Consume(), KeyType.Basic);
             }
             else if (tokens.TryExpect(TokenType.LiteralString))
             {
-                return CreateKey(tokens.Consume(), TomlKey.KeyType.Literal);
+                return CreateKey(tokens.Consume(), KeyType.Literal);
             }
             else if (required)
             {
@@ -40,7 +40,7 @@
             }
         }
 
-        private static TomlKey CreateKey(Token tkn, TomlKey.KeyType type)
+        private static TomlKey CreateKey(Token tkn, KeyType type)
         {
             var key = new TomlKey(tkn.value, type)
             {
