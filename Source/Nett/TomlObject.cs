@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using Nett.Parser;
 
     [Flags]
     public enum TomlObjectType
@@ -37,7 +38,7 @@
 
         internal ITomlRoot Root { get; }
 
-        internal ParsingInfo ParseInfo { get; set; } = ParsingInfo.NotAvailable;
+        internal ParseInfo ParseInfo { get; set; } = ParseInfo.NotAvailable;
 
         public TomlObject AddComment(TomlComment comment)
         {

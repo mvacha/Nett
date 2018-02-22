@@ -24,7 +24,7 @@ namespace Nett
             long value = long.Parse(token.value.Replace("_", string.Empty));
             return new TomlInt(root, value)
             {
-                ParseInfo = ParsingInfo.CreateFromToken(token)
+                ParseInfo = Parser.ParseInfo.CreateFromToken(token)
             };
         }
 

@@ -12,7 +12,7 @@ namespace Nett
     public partial class TomlTable : TomlObject, IDictionary<string, TomlObject>
     {
         private readonly OrderedDictionary<string, TomlObject> rows = new OrderedDictionary<string, TomlObject>();
-        private readonly Dictionary<string, KeyMetaInfo> keyMeta = new Dictionary<string, KeyMetaInfo>();
+        // private readonly Dictionary<string, KeyMetaInfo> keyMeta = new Dictionary<string, KeyMetaInfo>();
 
         private volatile bool isFrozen = false;
 
@@ -65,14 +65,7 @@ namespace Nett
 
                 KeyValuePair<TomlKey, TomlObject> CreateInternalRow(KeyValuePair<string, TomlObject> r)
                 {
-                    if (this.keyMeta.TryGetValue(r.Key, out var meta))
-                    {
-                        return new KeyValuePair<TomlKey, TomlObject>(new TomlKey(r.Key, meta.KeyType), r.Value);
-                    }
-                    else
-                    {
-                        return new KeyValuePair<TomlKey, TomlObject>(new TomlKey(r.Key), r.Value);
-                    }
+                    return new KeyValuePair<TomlKey, TomlObject>(new TomlKey(r.Key), r.Value);
                 }
             }
         }
@@ -206,10 +199,10 @@ namespace Nett
         public IEnumerator<KeyValuePair<string, TomlObject>> GetEnumerator() => this.rows.GetEnumerator();
 
         void ICollection<KeyValuePair<string, TomlObject>>.Add(KeyValuePair<string, TomlObject> item)
-            => this.AddRow(new TomlKey(item.Key), item.Value);
+            => this.AddRowInternal(item.Key, item.Value);
 
         void IDictionary<string, TomlObject>.Add(string key, TomlObject value)
-            => this.AddRow(new TomlKey(key), value);
+            => this.AddRowInternal(key, value);
 
         IEnumerator IEnumerable.GetEnumerator() => this.rows.GetEnumerator();
 
@@ -253,16 +246,8 @@ namespace Nett
             return (TomlTable)ClrToTomlTableConverter.Convert(obj, root);
         }
 
-        internal TomlObject AddRow(TomlKey key, TomlObject value)
-        {
-            this.CheckNotFrozen();
-            var toAdd = this.EnsureCorrectRoot(value);
-
-            this.rows.Add(key.Value, toAdd);
-            this.keyMeta.Add(key.Value, new KeyMetaInfo(key.Type));
-
-            return toAdd;
-        }
+        internal TomlObject AddRow(string key, TomlObject value)
+            => this.AddRowInternal(key, value);
 
         internal override TomlObject CloneFor(ITomlRoot root) => this.CloneTableFor(root);
 
@@ -273,11 +258,6 @@ namespace Nett
             foreach (var r in this.rows)
             {
                 tbl.rows.Add(r.Key, r.Value.CloneFor(root));
-            }
-
-            foreach (var r in this.keyMeta)
-            {
-                tbl.keyMeta.Add(r.Key, r.Value);
             }
 
             return tbl;
@@ -306,7 +286,6 @@ namespace Nett
         internal void SetRow(TomlKey key, TomlObject value)
         {
             this.rows[key.Value] = value;
-            this.keyMeta[key.Value] = new KeyMetaInfo(key.Type);
         }
 
         internal TomlObject TryGetValue(TomlKey key) => this.TryGetValue(key.Value);
@@ -322,11 +301,6 @@ namespace Nett
                 table.rows.Add(r.Key, r.Value.WithRoot(root));
             }
 
-            foreach (var r in this.keyMeta)
-            {
-                table.keyMeta.Add(r.Key, r.Value);
-            }
-
             return table;
         }
 
@@ -338,6 +312,16 @@ namespace Nett
 
         private static bool ScopeCreatingType(TomlObject obj) =>
             obj.TomlType == TomlObjectType.Table || obj.TomlType == TomlObjectType.ArrayOfTables;
+
+        private TomlObject AddRowInternal(string key, TomlObject value)
+        {
+            this.CheckNotFrozen();
+            var toAdd = this.EnsureCorrectRoot(value);
+
+            this.rows.Add(key, toAdd);
+
+            return toAdd;
+        }
 
         [Conditional(Constants.Debug)]
         private void AssertIntegrity()

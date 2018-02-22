@@ -48,7 +48,7 @@
                 var existingRow = addTo.TryGetValue(key);
                 if (existingRow == null)
                 {
-                    addTo.AddRow(key, newTable);
+                    addTo.AddRow(key.Value, newTable);
                 }
                 else
                 {
@@ -72,10 +72,10 @@
                 var kvp = KeyValuePairProduction.Apply(root, tokens);
                 if (kvp != null)
                 {
-                    kvp.Item2.AddComments(preComments);
-                    kvp.Item2.AddComments(CommentProduction.TryParseAppendExpressionComments(expressionToken, tokens));
+                    kvp.Value.AddComments(preComments);
+                    kvp.Value.AddComments(CommentProduction.TryParseAppendExpressionComments(expressionToken, tokens));
 
-                    current.AddRow(kvp.Item1, kvp.Item2);
+                    current.AddRow(kvp.Key.Value, kvp.Value);
                     return current;
                 }
             }
@@ -103,7 +103,7 @@
             }
 
             var newTableArray = new TomlTableArray(target.Root);
-            target.AddRow(key, newTableArray);
+            target.AddRow(key.Value, newTableArray);
 
             return newTableArray;
         }
@@ -113,7 +113,7 @@
             Func<TomlTable, TomlTable> createNew = (e) =>
                 {
                     var newTable = new TomlTable(tbl.Root);
-                    tbl.AddRow(key, newTable);
+                    tbl.AddRow(key.Value, newTable);
                     return newTable;
                 };
 
@@ -127,7 +127,7 @@
                 var array = new TomlTableArray(tbl.Root);
                 var newTable = new TomlTable(tbl.Root);
                 array.Add(newTable);
-                tbl.AddRow(key, array);
+                tbl.AddRow(key.Value, array);
                 return newTable;
             };
 

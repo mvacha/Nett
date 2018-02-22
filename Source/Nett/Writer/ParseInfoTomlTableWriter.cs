@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Nett.Parser.Productions;
 using Nett.Util;
 using static System.Diagnostics.Debug;
 
@@ -58,18 +59,24 @@ namespace Nett.Writer
             }
         }
 
-        private void WriteKey(TomlKey key)
+        private void WriteKey(TomlKey key, KeyValuePairProduction.KeyParseInfo keyParseInfo)
         {
-            this.writer.Write(key.ParseInfo.Whitespace);
+            this.writer.Write(keyParseInfo.NameInfo.Whitespace);
             this.writer.Write(key.Value);
-            this.writer.Write(key.AssignmentParseInfo.Whitespace);
+            this.writer.Write(keyParseInfo.AssignmentInfo.Whitespace);
             this.writer.Write("=");
         }
 
-        private void WriteTableRow(string parentKey, KeyValuePair<TomlKey, TomlObject> r, int rowIndex, int alignColumn, int level)
+        private void WriteTableRow(
+            string parentKey,
+            KeyValuePair<TomlKey, TomlObject> r,
+            KeyValuePairProduction.KeyParseInfo keyInfo,
+            int rowIndex,
+            int alignColumn,
+            int level)
         {
             this.WritePrependComments(r.Value, level);
-            this.WriteKey(r.Key);
+            this.WriteKey(r.Key, keyInfo);
             if (r.Value.TomlType == TomlObjectType.Array)
             {
                 this.WriteArray((TomlArray)r.Value);

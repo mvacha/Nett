@@ -94,7 +94,7 @@ namespace Nett.Coma.Path
                 foreach (var r in objTable.Rows)
                 {
                     var toAdd = r.Value is TomlTable t ? new ProxySubTable(t, this) : r.Value;
-                    this.AddRow(new TomlKey(r.Key), toAdd);
+                    this.AddRow(r.Key, toAdd);
                 }
             }
 
@@ -124,7 +124,7 @@ namespace Nett.Coma.Path
                     foreach (var r in tbl)
                     {
                         var toAdd = r.Value is TomlTable t ? new ProxySubTable(t, this.root) : r.Value;
-                        this.AddRow(new TomlKey(r.Key), toAdd);
+                        this.AddRow(r.Key, toAdd);
                     }
                 }
 

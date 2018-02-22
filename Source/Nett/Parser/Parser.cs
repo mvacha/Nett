@@ -50,7 +50,7 @@
                 }
             }
 
-            root.EofParseInfo = ParsingInfo.CreateFromToken(this.Tokens.Peek());
+            root.EofParseInfo = ParseInfo.CreateFromToken(this.Tokens.Peek());
             return root;
         }
     }

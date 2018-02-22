@@ -1,7 +1,8 @@
-﻿namespace Nett
-{
-    using System;
+﻿using System;
+using Nett.Parser;
 
+namespace Nett
+{
     public partial class TomlTable
     {
         internal static RootTable From(TomlSettings settings, object obj)
@@ -16,7 +17,7 @@
 
         internal sealed class RootTable : TomlTable, ITomlRoot
         {
-            internal ParsingInfo EofParseInfo;
+            internal ParseInfo EofParseInfo;
 
             private readonly TomlSettings settings;
 

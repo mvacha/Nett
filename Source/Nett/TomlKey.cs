@@ -7,24 +7,16 @@ namespace Nett
         public readonly string Value;
         public KeyType Type;
 
-        // Parse Info is 'Meta' data => does not modify the 'value'. It is allowed to modify these in a mutable way.
-        internal ParsingInfo ParseInfo;
-        internal ParsingInfo AssignmentParseInfo;
-
         public TomlKey(string s)
         {
             this.Type = AutoClassify(s);
             this.Value = s;
-            this.ParseInfo = ParsingInfo.NotAvailable;
-            this.AssignmentParseInfo = ParsingInfo.NotAvailable;
         }
 
         public TomlKey(string key, KeyType type)
         {
             this.Value = key;
             this.Type = type;
-            this.ParseInfo = ParsingInfo.NotAvailable;
-            this.AssignmentParseInfo = ParsingInfo.NotAvailable;
         }
 
         public static bool operator ==(TomlKey x, TomlKey y) => x.Value == y.Value;

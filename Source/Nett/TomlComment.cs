@@ -17,7 +17,7 @@ namespace Nett
 
         public string Text { get; }
 
-        internal ParsingInfo ParseInfo { get; private set; } = ParsingInfo.NotAvailable;
+        internal ParseInfo ParseInfo { get; private set; } = ParseInfo.NotAvailable;
 
         private string DebuggerDisplay
         {
@@ -32,7 +32,7 @@ namespace Nett
         {
             return new TomlComment(token.value, location)
             {
-                ParseInfo = ParsingInfo.CreateFromToken(token),
+                ParseInfo = ParseInfo.CreateFromToken(token),
             };
         }
 

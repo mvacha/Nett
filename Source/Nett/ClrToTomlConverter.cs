@@ -164,12 +164,12 @@ namespace Nett
         {
             foreach (var a in allObjects.Where(o => !ScopeCreatingType(o.Item2)))
             {
-                target.AddRow(new TomlKey(a.Item1), a.Item2);
+                target.AddRow(a.Item1, a.Item2);
             }
 
             foreach (var a in allObjects.Where(o => ScopeCreatingType(o.Item2)))
             {
-                target.AddRow(new TomlKey(a.Item1), a.Item2);
+                target.AddRow(a.Item1, a.Item2);
             }
         }
 

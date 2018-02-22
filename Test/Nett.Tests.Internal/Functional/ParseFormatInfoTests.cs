@@ -41,7 +41,7 @@ x = 1";
             pi.Whitespace.Should().Be(WS);
         }
 
-        [FFact(FuncParseFmtInfo, "When KVP-row has whitespace, parse info has corresponding whitespace")]
+        [Fact(Skip = "Parse info not exposed yet.")]
         public void ReadTable_WhenKeyValueRowHasWhitespace_ParseInfoHasSameWhitespace()
         {
             // Arrange
@@ -53,10 +53,10 @@ x = 1";
 
             // Assert
             var kvp = tbl.InternalRows.Where(r => r.Key.Value == "y").Single();
-            kvp.Key.ParseInfo.Whitespace.Should().Be(WS);
+            //kvp.Key.ParseInfo.Whitespace.Should().Be(WS);
         }
 
-        [Fact]
+        [Fact(Skip = "Parse info not exposed yet.")]
         public void ReadToml_WithWhitespaceBetwennKeyAndAssignment_CreatesParseInfoWithThatWhitespace()
         {
             // Arrange
@@ -69,8 +69,8 @@ x = 1";
 
             // Assert
             var k = tbl.InternalRows.Select(r => r.Key).ElementAt(0);
-            k.ParseInfo.Whitespace.Should().Be("");
-            k.AssignmentParseInfo.Whitespace.Should().Be(WS);
+            //k.ParseInfo.Whitespace.Should().Be("");
+            //k.AssignmentParseInfo.Whitespace.Should().Be(WS);
         }
 
         [Fact]

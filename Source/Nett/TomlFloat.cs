@@ -25,7 +25,7 @@ namespace Nett
             double value = double.Parse(token.value.Replace("_", string.Empty), CultureInfo.InvariantCulture);
             return new TomlFloat(root, value)
             {
-                ParseInfo = ParsingInfo.CreateFromToken(token),
+                ParseInfo = Parser.ParseInfo.CreateFromToken(token),
             };
         }
 

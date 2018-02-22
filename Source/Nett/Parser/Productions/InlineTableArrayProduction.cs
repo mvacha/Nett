@@ -17,7 +17,7 @@
 
             var arr = new TomlTableArray(root);
             TomlTable tbl = null;
-            while ((tbl = InlineTableProduction.TryApply(root, tokens)) != null)
+            while ((tbl = InlineTableProduction.TryApply(root, tokens)?.Value) != null)
             {
                 arr.Add(tbl);
 

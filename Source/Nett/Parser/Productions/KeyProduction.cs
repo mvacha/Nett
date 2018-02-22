@@ -2,11 +2,11 @@
 {
     internal static class KeyProduction
     {
-        public static TomlKey Apply(TokenBuffer tokens) => ApplyInternal(tokens, required: true);
+        public static Key Apply(TokenBuffer tokens) => ApplyInternal(tokens, required: true);
 
-        public static TomlKey TryApply(TokenBuffer tokens) => ApplyInternal(tokens, required: false);
+        public static Key TryApply(TokenBuffer tokens) => ApplyInternal(tokens, required: false);
 
-        private static TomlKey ApplyInternal(TokenBuffer tokens, bool required)
+        private static Key ApplyInternal(TokenBuffer tokens, bool required)
         {
             var tkn = tokens.Peek();
 
@@ -36,18 +36,21 @@
             }
             else
             {
-                return new TomlKey(string.Empty);
+                return null;
             }
         }
 
-        private static TomlKey CreateKey(Token tkn, KeyType type)
+        private static Key CreateKey(Token tkn, KeyType type)
         {
-            var key = new TomlKey(tkn.value, type)
-            {
-                ParseInfo = ParsingInfo.CreateFromToken(tkn)
-            };
+            return new Key(tkn.value, ParseInfo.CreateFromToken(tkn));
+        }
 
-            return key;
+        public sealed class Key : Parsed<string, ParseInfo>
+        {
+            public Key(string value, ParseInfo meta)
+                : base(value, meta)
+            {
+            }
         }
     }
 }

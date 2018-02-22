@@ -97,7 +97,7 @@ namespace Nett
             where T : TomlObject
         {
             Assert(o.Root == table.Root);
-            table.AddRow(new TomlKey(key), o);
+            table.AddRow(key, o);
             return o;
         }
     }

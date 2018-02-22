@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Nett.Parser;
 using Nett.Util;
 
 using static System.Diagnostics.Debug;
@@ -56,7 +57,7 @@ namespace Nett.Writer
             }
         }
 
-        protected void WriteWithWhitespace(ParsingInfo pi, string value)
+        protected void WriteWithWhitespace(ParseInfo pi, string value)
         {
             this.writer.Write(pi.Whitespace);
             this.writer.Write(value);
