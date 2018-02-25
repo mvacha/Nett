@@ -81,7 +81,7 @@
                 case TomlObjectType.Float: this.writer.Write("{0:0.0###############}", ((TomlFloat)obj).Value); break;
                 case TomlObjectType.Int: this.writer.Write(((TomlInt)obj).Value); break;
                 case TomlObjectType.DateTime: this.writer.Write(((TomlDateTime)obj).ToString()); break;
-                case TomlObjectType.TimeSpan: this.writer.Write(((TomlTimeSpan)obj).Value); break;
+                case TomlObjectType.TimeSpan: this.writer.Write(((TomlTimeSpan)obj).ToString()); break;
                 case TomlObjectType.String: this.writer.Write(((TomlString)obj).QuotedAndEscapedValue()); break;
                 default:
                     Assert(false, "This method should only get called for simple TOML Types. Check invocation code.");

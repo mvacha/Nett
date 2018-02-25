@@ -57,10 +57,10 @@ namespace Nett.Tests
         }
 
         [Theory]
-        [InlineData("02:01", "02:01:00")]
-        [InlineData("03:02:01", "03:02:01")]
-        [InlineData("4.03:02:01", "4.03:02:01")]
-        [InlineData("4.03:02:01.001", "4.03:02:01.0010000")]
+        [InlineData("02:01", "2h1m")]
+        [InlineData("03:02:01", "3h2m1s")]
+        [InlineData("4.03:02:01", "4d3h2m1s")]
+        [InlineData("4.03:02:01.001", "4d3h2m1s1ms")]
         public void WriteTimespan_WritesTheTimepspansInCultureInvariantFormat(string span, string expected)
         {
             var t = new TimespanType() { Ts = TimeSpan.Parse(span) };
@@ -68,6 +68,35 @@ namespace Nett.Tests
             var written = Toml.WriteString(t);
 
             written.Should().Be($"Ts = {expected}\r\n");
+        }
+
+        // .Net has no data structure with good sub MS resolution support, Yes TS can store US but there is no Microseconds
+        // property and so on, so for new nett just handles MS resolution, as anything else will be a pain to use anyway.
+        // The TS will parse the us and store them, but not write them to output!.
+        [Fact]
+        public void WriteTimespan_SupportsMSResolutionOnly()
+        {
+            // Arrange
+            var ts = new TimespanType() { Ts = TimeSpan.FromTicks(10) }; // 1us
+
+            // Act
+            var written = Toml.WriteString(ts);
+
+            // Assert
+            written.Should().Be($"Ts = 0ms\r\n");
+        }
+
+        [Fact]
+        public void WriteTimespan_AlwaysWritesValue()
+        {
+            // Arrange
+            var ts = new TimespanType() { Ts = TimeSpan.Zero };
+
+            // Act
+            var written = Toml.WriteString(ts);
+
+            // Assert
+            written.Should().Be($"Ts = 0ms\r\n");
         }
 
         [Fact]

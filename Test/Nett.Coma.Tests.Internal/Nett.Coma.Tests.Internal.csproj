@@ -71,6 +71,7 @@
     <Compile Include="Unit\FileConfigTests.cs" />
     <Compile Include="Unit\LambdaExpressionExtensionTests.cs" />
     <Compile Include="Unit\TomlTableExtensionsTests.cs" />
+    <Compile Include="Unit\TomlTimespanTests.cs" />
     <Compile Include="Unit\TPathTests.cs" />
     <Compile Include="Unit\TransactionUnitTests.cs" />
   </ItemGroup>

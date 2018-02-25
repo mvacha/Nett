@@ -243,7 +243,13 @@
             if (tokens.TryExpect(TokenType.Integer)) { return ParseTomlInt(root, tokens); }
             else if (tokens.TryExpect(TokenType.Float)) { return ParseTomlFloat(root, tokens); }
             else if (tokens.TryExpect(TokenType.DateTime)) { return TomlDateTime.Parse(root, tokens.Consume().value); }
-            else if (tokens.TryExpect(TokenType.Timespan)) { return new TomlTimeSpan(root, TimeSpan.Parse(tokens.Consume().value, CultureInfo.InvariantCulture)); }
+            else if (tokens.TryExpect(TokenType.BareKey) && TomlTimeSpan.TryParse(tokens.Peek().value, out TimeSpan ts))
+            {
+                // The new timespan format collides with the bare key token spec... so we have to do this not very nice
+                // try parse thingi here. Not nice, but OK i guess.
+                tokens.Consume();
+                return new TomlTimeSpan(root, ts);
+            }
             else if (tokens.TryExpect(TokenType.String)) { return ParseStringValue(root, tokens); }
             else if (tokens.TryExpect(TokenType.LiteralString)) { return ParseLiteralString(root, tokens); }
             else if (tokens.TryExpect(TokenType.MultilineString)) { return ParseMultilineString(root, tokens); }

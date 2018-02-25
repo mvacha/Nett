@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FluentAssertions;
+using Nett.Tests.Util.TestData;
 using Xunit;
 
 namespace Nett.Tests
@@ -292,17 +293,14 @@ trimmed in raw strings.
         }
 
         [Theory]
-        [InlineData("02:01")]
-        [InlineData("03:02:01")]
-        [InlineData("4.03:02:01")]
-        [InlineData("4.03:02:01.001")]
-        public void Deserialize_WithTimepsanInAllSupportedFormats_DeserializesCorrectly(string timespan)
+        [ClassData(typeof(ValidTimespans))]
+        public void Deserialize_WithTimepspanInAllSupportedFormats_DeserializesCorrectly(string timespan, TimeSpan expected)
         {
             var parsed = Toml.ReadString($"a = {timespan}");
 
             var a = parsed.Get<TimeSpan>("a");
 
-            Assert.Equal(TimeSpan.Parse(timespan), a);
+            a.Should().Be(expected);
         }
 
         [Fact]
@@ -443,7 +441,5 @@ color = ""gray""
             var t3 = a[2];
             Assert.Equal("Nail", t3.Get<string>("name"));
         }
-
-
     }
 }
