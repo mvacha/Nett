@@ -61,7 +61,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\TreeOperationsTests.cs" />
     <Compile Include="NestedTableViaConverterTests.cs" />
+    <Compile Include="Parser\AstParserTests.cs" />
     <Compile Include="Parser\LaBufferTests.cs" />
     <Compile Include="Parser\LexerTests.cs" />
     <Compile Include="Parser\ValueScopeTrackerTests.cs" />

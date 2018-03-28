@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Nett.Parser.Ast;
 
 namespace Nett.Parser
@@ -11,37 +12,49 @@ namespace Nett.Parser
         {
             this.input = input;
         }
-        Node Parse()
+
+        public TomlNode Parse()
         {
-            this.Expression();
-            this.ExpressionChain();
+            this.input.SkipWhitespace();
+
+            if (this.input.Eos) { return TomlNode.Empty(); }
+
+            var expressions = new List<ExpressionNode>();
+
+            var exp = this.Expression();
+            expressions.Add(exp);
+            //this.NextExpression();
+
+            return new TomlNode(expressions);
         }
 
-
-
-        void Expression()
+        private ExpressionNode Expression()
         {
             if (this.input.Accept(TokenType.Comment, out var comment)) { }
-            else if (this.input.Accept(TokenType.Key)
-                && this.input.Expect(TokenType.Assign))
+            else if (this.input.Accept(TokenType.BareKey, out var key)
+                && this.input.Accept(TokenType.Assign, out var assign))
             {
-                Value();
+                return new KeyValueExpressionNode(key, assign, this.Value());
             }
             else if (this.input.Accept(TokenType.LBrac, out _)
                 && this.input.Expect(TokenType.Key)
                 && this.input.Expect(TokenType.RBrac)) { }
-            else if ()
+
+
+            throw new NotImplementedException();
         }
 
-        private void ExpressionChain()
+        private IEnumerable<ExpressionNode> NextExpression()
         {
+            this.input.ExpectNewlines();
 
+            throw new NotImplementedException();
         }
 
-        private void Value()
+        private ValueNode Value()
         {
-            if (this.input.Accept(TokenType.Float)) { }
-            else if (this.input.Accept(TokenType.Integer)) { }
+            if (this.input.Accept(TokenType.Float, out var floatToken)) { }
+            else if (this.input.Accept(TokenType.Integer, out var intToken)) { return new IntValueNode(intToken); }
             else if (this.input.Accept(TokenType.LBrac))
             {
                 this.ArrayItem();
@@ -52,11 +65,13 @@ namespace Nett.Parser
                 this.InlineTable();
                 this.input.Expect(TokenType.RCurly);
             }
+
+            throw new NotImplementedException();
         }
 
         private void ArrayItem()
         {
-            if (this.input.Is(TokenType.RBrac) { }
+            if (this.input.Expect(TokenType.RBrac)) { }
             else
             {
                 this.Value();
@@ -66,7 +81,7 @@ namespace Nett.Parser
 
         private void ArrayCombine()
         {
-            if (this.input.Is(TokenType.RBrac)) { this.Epsilon(); }
+            if (this.input.Expect(TokenType.RBrac)) { this.Epsilon(); }
             else if (this.input.Accept(TokenType.Comma))
             {
                 this.NextArrayItem();
@@ -79,7 +94,7 @@ namespace Nett.Parser
 
         private void NextArrayItem()
         {
-            if (this.input.Is(TokenType.RBrac)) { this.Epsilon(); }
+            if (this.input.Expect(TokenType.RBrac)) { this.Epsilon(); }
             else
             {
                 this.ArrayItem();

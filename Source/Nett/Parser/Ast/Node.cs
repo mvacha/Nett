@@ -1,18 +1,28 @@
 ﻿using System.Collections.Generic;
+using System.Text;
+using Nett.Collections;
 
 namespace Nett.Parser.Ast
 {
-    internal sealed class Node
+    internal abstract class Node : IGetChildren<Node>
     {
-        public IEnumerable<Node> Children { get; }
+        public abstract IEnumerable<Node> Children { get; }
 
-        public IEnumerable<Token> Tokens { get; }
+        IEnumerable<Node> IGetChildren<Node>.GetChildren()
+            => this.Children;
 
-        public Node(Token token, IEnumerable<Node> children)
+        public string PrintTree()
         {
-            this.Children = new List<Token>() { token };
-        }
+            var builder = new StringBuilder();
+            var allNodes = this.TraversePreOrderWithDepth();
 
-        public Node(IEnumerable<Token> tokens, )
+            foreach (var n in allNodes)
+            {
+                builder.Append(new string(' ', n.Depth))
+                    .AppendLine(n.Node.ToString());
+            }
+
+            return builder.ToString();
+        }
     }
 }

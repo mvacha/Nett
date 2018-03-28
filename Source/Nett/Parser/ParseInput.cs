@@ -5,7 +5,7 @@ namespace Nett.Parser
 {
     internal sealed class ParseInput
     {
-        private static readonly Token None = Token.EndOfFile(-1, -1);
+        private static readonly Token NoTokenAvailable = Token.EndOfFile(-1, -1);
 
         private readonly List<Token> tokens;
 
@@ -15,13 +15,17 @@ namespace Nett.Parser
         {
             this.tokens = tokens;
         }
+        public bool Eos
+            => this.index >= this.tokens.Count - 1;
+
+        private Token CurrentToken => this.tokens[this.index];
 
         public bool Accept(TokenType token)
             => this.Accept(token, out _);
 
         public bool Accept(TokenType token, out Token accepted)
         {
-            accepted = None;
+            accepted = NoTokenAvailable;
 
             if (this.CurrentToken.type == token)
             {
@@ -34,8 +38,19 @@ namespace Nett.Parser
         }
 
         public bool Expect(TokenType token)
-        {
+            => this.Expect(token, out _);
 
+        public bool Expect(TokenType token, out Token expected)
+        {
+            expected = NoTokenAvailable;
+
+            if (this.CurrentToken.type == token)
+            {
+                expected = this.CurrentToken;
+                return true;
+            }
+
+            return false;
         }
 
         public bool ExpectNewlines()
@@ -43,16 +58,18 @@ namespace Nett.Parser
             throw new NotImplementedException();
         }
 
-        private Token CurrentToken => this.tokens[this.index];
+        public IEnumerable<Token> SkipWhitespace()
+        {
+            while (this.Expect(TokenType.NewLine))
+            {
+                yield return this.CurrentToken;
+                this.Advance();
+            }
+        }
 
         private void Advance()
         {
             this.index++;
-        }
-
-        internal bool Is(TokenType rBrac)
-        {
-            throw new NotImplementedException();
         }
     }
 }
