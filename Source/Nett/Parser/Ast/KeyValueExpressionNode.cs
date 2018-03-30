@@ -4,11 +4,11 @@ namespace Nett.Parser.Ast
 {
     internal sealed class KeyValueExpressionNode : ExpressionNode
     {
-        public KeyValueExpressionNode(Token key, Token assignment, ValueNode value)
+        public KeyValueExpressionNode(Token key, Token assignment, Node value)
         {
             this.Key = new KeyNode(key);
             this.Assignment = new SymbolNode(assignment);
-            this.Value = value;
+            this.Value = (ValueNode)value;
         }
 
         public KeyNode Key { get; }

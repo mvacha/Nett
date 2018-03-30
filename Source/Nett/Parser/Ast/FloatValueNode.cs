@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace Nett.Parser.Ast
 {
-    internal sealed class FloatNode : ValueNode
+    internal sealed class FloatValueNode : ValueNode
     {
-        public FloatNode(Token token)
+        public FloatValueNode(Token token)
         {
             this.Value = this.CheckTokenType(TokenType.Float, token);
         }

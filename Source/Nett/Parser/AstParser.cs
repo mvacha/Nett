@@ -8,13 +8,9 @@ namespace Nett.Parser
     {
         private readonly ParseInput input;
 
-        private readonly IProduction<CommentNode> commentProduction;
-
         public AstParser(ParseInput input)
         {
             this.input = input;
-
-            this.commentProduction = this.input.Accept(t => t == TokenType.Comment, t => new CommentNode(t));
         }
 
         public TomlNode Parse()
@@ -64,59 +60,63 @@ namespace Nett.Parser
 
         private Node Value()
         {
-            return IntValueNode()
-                ?? FloatValueNode()
+            return IntValue()
+                ?? FloatValue()
                 ?? Array()
                 ?? InlineTable();
 
-            Node FloatValue() => this.input
-                .Accept(t => t.type == TokenType.Float)
-                .CreateNode(t => new FloatValueNode(t));
+            Node FloatValue()
+                => this.input
+                    .Accept(t => t.type == TokenType.Float)
+                    .CreateNode(t => new FloatValueNode(t));
 
-            Node IntValue() => this.input
-                .Accept(t => t.type == TokenType.Integer)
-                .CreateNode(t => new IntValueNode(t));
+            Node IntValue()
+                => this.input
+                    .Accept(t => t.type == TokenType.Integer)
+                    .CreateNode(t => new IntValueNode(t));
 
-            Node Array() => this.input
-                .Accept(t => t.type == TokenType.LBrac)
-                .CreateNode(_ => this.ArrayItem());
+            Node Array()
+                => this.input
+                    .Accept(t => t.type == TokenType.LBrac)
+                    .CreateNode(t => this.Array(t));
 
-            Node InlineTable() => this.input
-                .Accept(t => t.type == TokenType.LCurly)
-                .CreateNode(_ => this.InlineTable());
+            Node InlineTable()
+                => this.input
+                    .Accept(t => t.type == TokenType.LCurly)
+                    .CreateNode(_ => this.InlineTable());
         }
 
-        private Node ArrayItem()
+        private Node Array(Token lbrac)
         {
-            if (this.input.Expect(TokenType.RBrac)) { }
-            else
-            {
-                this.Value();
-                this.ArrayCombine();
-            }
+            var eps = Epsilon();
+            if (eps != null) { return eps; }
+
+            Node value = this.Value();
+            Node separator = this.ArraySeparator();
+
+            return this.input.Expect(t => t.type == TokenType.RBrac)
+                .CreateNode(t => ArrayNode.Create(lbrac, t, value, separator));
+
+            Node Epsilon()
+                => this.input
+                    .Accept(t => t.type == TokenType.RBrac)
+                    .CreateNode(t => ArrayNode.Empty(lbrac, t));
         }
 
-        private void ArrayCombine()
+        private Node ArraySeparator()
         {
-            if (this.input.Expect(TokenType.RBrac)) { this.Epsilon(); }
-            else if (this.input.Accept(TokenType.Comma))
-            {
-                this.NextArrayItem();
-            }
-            else
-            {
-                throw new Exception();
-            }
+            if (Epsilon()) { return null; }
+
+            return this.input.Expect(t => t.type == TokenType.Comma)
+                .CreateNode(t => new SymbolNode(t, this.Value()));
+
+            bool Epsilon()
+                => this.input
+                    .Accept(t => t.type == TokenType.RBrac)
+                    .CreateNode(t => new SymbolNode(t)) != null;
         }
 
-        private void NextArrayItem()
-        {
-            if (this.input.Expect(TokenType.RBrac)) { this.Epsilon(); }
-            else
-            {
-                this.ArrayItem();
-            }
-        }
+
 
         private Node InlineTable()
         {
