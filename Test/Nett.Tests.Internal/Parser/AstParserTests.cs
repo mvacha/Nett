@@ -8,7 +8,7 @@ namespace Nett.Tests.Internal.Parser
     public sealed class AstParserTests
     {
         [Fact]
-        public void Foox()
+        public void Parse_SingleKeyValueExpression_CorrectAst()
         {
             // Act
             var parsed = Parse("x = 100");
@@ -16,10 +16,26 @@ namespace Nett.Tests.Internal.Parser
             // Assert
             parsed.PrintTree().Trim().Should().Be(@"
 T
- E -> KV
+ E -> k=V
   k -> x
   s -> =
   V -> 100
+".Trim());
+        }
+
+        [Fact]
+        public void Parse_BrokenKeyValueExpression_CreatesAstWithSyntaxErrorNode()
+        {
+            // Act
+            var parsed = Parse("x = ");
+
+            // Assert
+            parsed.PrintTree().Trim().Should().Be(@"
+T
+ E -> k=V
+  k -> x
+  s -> =
+  X
 ".Trim());
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Nett.Collections;
 
@@ -6,6 +7,16 @@ namespace Nett.Parser.Ast
 {
     internal abstract class Node : IGetChildren<Node>
     {
+        protected Token CheckTokenType(TokenType expected, Token t)
+        {
+            if (t.type != expected)
+            {
+                throw new ArgumentException($"Expected token of type '{expected}' but actual token has type '{t.type}'.");
+            }
+
+            return t;
+        }
+
         public abstract IEnumerable<Node> Children { get; }
 
         IEnumerable<Node> IGetChildren<Node>.GetChildren()

@@ -8,9 +8,13 @@ namespace Nett.Parser
     {
         private readonly ParseInput input;
 
+        private readonly IProduction<CommentNode> commentProduction;
+
         public AstParser(ParseInput input)
         {
             this.input = input;
+
+            this.commentProduction = this.input.Accept(t => t == TokenType.Comment, t => new CommentNode(t));
         }
 
         public TomlNode Parse()
@@ -19,7 +23,7 @@ namespace Nett.Parser
 
             if (this.input.Eos) { return TomlNode.Empty(); }
 
-            var expressions = new List<ExpressionNode>();
+            var expressions = new List<Node>();
 
             var exp = this.Expression();
             expressions.Add(exp);
@@ -28,20 +32,27 @@ namespace Nett.Parser
             return new TomlNode(expressions);
         }
 
-        private ExpressionNode Expression()
+        private Node Expression()
         {
-            if (this.input.Accept(TokenType.Comment, out var comment)) { }
-            else if (this.input.Accept(TokenType.BareKey, out var key)
-                && this.input.Accept(TokenType.Assign, out var assign))
-            {
-                return new KeyValueExpressionNode(key, assign, this.Value());
-            }
-            else if (this.input.Accept(TokenType.LBrac, out _)
-                && this.input.Expect(TokenType.Key)
-                && this.input.Expect(TokenType.RBrac)) { }
+            return Comment() ?? KeyValueExpression() ?? Table();
 
+            Node Comment()
+                => this.input
+                    .Accept(t => t.type == TokenType.Comment)
+                    .CreateNode(t => new CommentNode(t));
 
-            throw new NotImplementedException();
+            Node KeyValueExpression()
+                => this.input
+                    .Accept(t => t.type == TokenType.BareKey)
+                    .Expect(t => t.type == TokenType.Assign)
+                    .CreateNode((k, a) => new KeyValueExpressionNode(k, a, this.Value()));
+
+            Node Table()
+                => this.input
+                    .Accept(t => t.type == TokenType.LBrac)
+                    .Expect(t => t.type == TokenType.BareKey)
+                    .Expect(t => t.type == TokenType.RBrac)
+                    .CreateNode((_, k, __) => new TableNode(k));
         }
 
         private IEnumerable<ExpressionNode> NextExpression()
@@ -51,25 +62,31 @@ namespace Nett.Parser
             throw new NotImplementedException();
         }
 
-        private ValueNode Value()
+        private Node Value()
         {
-            if (this.input.Accept(TokenType.Float, out var floatToken)) { }
-            else if (this.input.Accept(TokenType.Integer, out var intToken)) { return new IntValueNode(intToken); }
-            else if (this.input.Accept(TokenType.LBrac))
-            {
-                this.ArrayItem();
-                this.input.Expect(TokenType.RBrac);
-            }
-            else if (this.input.Accept(TokenType.LCurly))
-            {
-                this.InlineTable();
-                this.input.Expect(TokenType.RCurly);
-            }
+            return IntValueNode()
+                ?? FloatValueNode()
+                ?? Array()
+                ?? InlineTable();
 
-            throw new NotImplementedException();
+            Node FloatValue() => this.input
+                .Accept(t => t.type == TokenType.Float)
+                .CreateNode(t => new FloatValueNode(t));
+
+            Node IntValue() => this.input
+                .Accept(t => t.type == TokenType.Integer)
+                .CreateNode(t => new IntValueNode(t));
+
+            Node Array() => this.input
+                .Accept(t => t.type == TokenType.LBrac)
+                .CreateNode(_ => this.ArrayItem());
+
+            Node InlineTable() => this.input
+                .Accept(t => t.type == TokenType.LCurly)
+                .CreateNode(_ => this.InlineTable());
         }
 
-        private void ArrayItem()
+        private Node ArrayItem()
         {
             if (this.input.Expect(TokenType.RBrac)) { }
             else
@@ -101,7 +118,7 @@ namespace Nett.Parser
             }
         }
 
-        private void InlineTable()
+        private Node InlineTable()
         {
 
         }

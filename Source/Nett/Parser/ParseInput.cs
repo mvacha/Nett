@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Nett.Parser.Ast;
 
 namespace Nett.Parser
 {
-    internal sealed class ParseInput
+
+
+    internal sealed partial class ParseInput
     {
         private static readonly Token NoTokenAvailable = Token.EndOfFile(-1, -1);
 
@@ -15,42 +18,22 @@ namespace Nett.Parser
         {
             this.tokens = tokens;
         }
+
         public bool Eos
             => this.index >= this.tokens.Count - 1;
 
         private Token CurrentToken => this.tokens[this.index];
 
-        public bool Accept(TokenType token)
-            => this.Accept(token, out _);
-
-        public bool Accept(TokenType token, out Token accepted)
+        public IProduction1 Accept(Func<Token, bool> predicate)
         {
-            accepted = NoTokenAvailable;
-
-            if (this.CurrentToken.type == token)
-            {
-                accepted = this.CurrentToken;
-                this.Advance();
-                return true;
-            }
-
-            return false;
+            IProduction production = new Production(this);
+            return production.Accept(predicate);
         }
 
-        public bool Expect(TokenType token)
-            => this.Expect(token, out _);
-
-        public bool Expect(TokenType token, out Token expected)
+        public IProduction1 Expect(Func<Token, bool> predicate)
         {
-            expected = NoTokenAvailable;
-
-            if (this.CurrentToken.type == token)
-            {
-                expected = this.CurrentToken;
-                return true;
-            }
-
-            return false;
+            IProduction production = new Production(this);
+            return production.Expect(predicate);
         }
 
         public bool ExpectNewlines()
@@ -60,16 +43,53 @@ namespace Nett.Parser
 
         public IEnumerable<Token> SkipWhitespace()
         {
-            while (this.Expect(TokenType.NewLine))
+            while (this.CurrentToken.type == TokenType.NewLine)
             {
                 yield return this.CurrentToken;
                 this.Advance();
             }
         }
 
-        private void Advance()
+        private Token Advance()
+            => this.tokens[this.index++];
+
+        private SyntaxErrorNode CreateErrorNode()
+            => SyntaxErrorNode.Unexpected(this.CurrentToken);
+
+        private sealed class BrokenProduction : IProduction, IProduction1, IProduction2
         {
-            this.index++;
+            private readonly SyntaxErrorNode error;
+
+            public BrokenProduction(SyntaxErrorNode error)
+            {
+                this.error = error;
+            }
+
+            public Node Accept(Func<Token, bool> predicate, Func<Token, Token, Node> createNode)
+                => null;
+
+            public Node Expect(Func<Token, bool> predicate, Func<Token, Token, Node> createNode)
+                => this.error;
+
+            Node IProduction1.Accept(Func<Token, bool> predicate, Func<Token, Token, Node> createNode)
+            {
+                throw new NotImplementedException();
+            }
+
+            IProduction2 IProduction1.Accept(Func<Token, bool> predicate)
+            {
+                throw new NotImplementedException();
+            }
+
+            Node IProduction1.Expect(Func<Token, bool> predicate, Func<Token, Token, Node> createNode)
+            {
+                throw new NotImplementedException();
+            }
+
+            IProduction2 IProduction1.Expect(Func<Token, bool> predicate)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

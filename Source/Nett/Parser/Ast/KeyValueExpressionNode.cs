@@ -26,6 +26,6 @@ namespace Nett.Parser.Ast
             };
 
         public override string ToString()
-            => $"E -> KV";
+            => $"E -> k=V";
     }
 }
