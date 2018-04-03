@@ -63,7 +63,8 @@ namespace Nett.Parser
             return IntValue()
                 ?? FloatValue()
                 ?? Array()
-                ?? InlineTable();
+                ?? InlineTable()
+                ?? this.input.CreateErrorNode();
 
             Node FloatValue()
                 => this.input
@@ -116,11 +117,9 @@ namespace Nett.Parser
                     .CreateNode(t => new SymbolNode(t)) != null;
         }
 
-
-
         private Node InlineTable()
         {
-
+            throw new NotImplementedException();
         }
 
         private void Epsilon()

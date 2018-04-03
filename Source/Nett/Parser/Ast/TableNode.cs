@@ -8,7 +8,7 @@ namespace Nett.Parser.Ast
     {
         public TableNode(Token key)
         {
-            if (key.type != TokenType.Key)
+            if (key.type != TokenType.Key && key.type != TokenType.BareKey)
             {
                 throw new ArgumentException($"Token has to be of type 'key' but is '{key.type}'.");
             }
@@ -20,5 +20,8 @@ namespace Nett.Parser.Ast
 
         public override IEnumerable<Node> Children
             => Enumerable.Empty<Node>();
+
+        public override string ToString()
+            => $"T -> {this.Key.value}";
     }
 }

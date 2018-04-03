@@ -28,5 +28,8 @@ namespace Nett.Parser.Ast
                 unexpected.line,
                 unexpected.col);
         }
+
+        public override string ToString()
+            => "X";
     }
 }

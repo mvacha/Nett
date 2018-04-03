@@ -24,6 +24,32 @@ T
         }
 
         [Fact]
+        public void Parse_TableKey_CreatesCorrectAst()
+        {
+            // Act
+            var parsed = Parse("[tablekey]");
+
+            // Assert
+            parsed.PrintTree().Trim().Should().Be(@"
+T
+ T -> tablekey
+".Trim());
+        }
+
+        [Fact]
+        public void Parse_SingleKey_CreateSyntaxErrorNode()
+        {
+            // Act
+            var parsed = Parse("x");
+
+            // Assert
+            parsed.PrintTree().Trim().Should().Be(@"
+T
+ X
+".Trim());
+        }
+
+        [Fact]
         public void Parse_BrokenKeyValueExpression_CreatesAstWithSyntaxErrorNode()
         {
             // Act

@@ -24,7 +24,7 @@ namespace Nett.Parser
 
             protected T Apply<T>(Func<Token, bool> predicate, Func<Token, T> onSuccess, Func<T> onFail)
                 => predicate(this.Current)
-                    ? onSuccess(this.input, this.Advance())
+                    ? onSuccess(this.Advance())
                     : onFail();
 
             protected ErrorProduction CreateError()

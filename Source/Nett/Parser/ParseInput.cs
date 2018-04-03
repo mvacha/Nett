@@ -20,15 +20,21 @@ namespace Nett.Parser
         }
 
         public bool Eos
-            => this.index >= this.tokens.Count - 1;
+            => this.index > this.tokens.Count - 1;
 
-        private Token CurrentToken => this.tokens[this.index];
+        private Token CurrentToken =>
+            this.index < this.tokens.Count
+                ? this.tokens[this.index]
+                : NoTokenAvailable;
 
         public IProduction1 Accept(Func<Token, bool> predicate)
         {
             IProduction production = new Production(this);
             return production.Accept(predicate);
         }
+
+        public SyntaxErrorNode CreateErrorNode()
+            => SyntaxErrorNode.Unexpected(this.CurrentToken);
 
         public IProduction1 Expect(Func<Token, bool> predicate)
         {
@@ -52,44 +58,5 @@ namespace Nett.Parser
 
         private Token Advance()
             => this.tokens[this.index++];
-
-        private SyntaxErrorNode CreateErrorNode()
-            => SyntaxErrorNode.Unexpected(this.CurrentToken);
-
-        private sealed class BrokenProduction : IProduction, IProduction1, IProduction2
-        {
-            private readonly SyntaxErrorNode error;
-
-            public BrokenProduction(SyntaxErrorNode error)
-            {
-                this.error = error;
-            }
-
-            public Node Accept(Func<Token, bool> predicate, Func<Token, Token, Node> createNode)
-                => null;
-
-            public Node Expect(Func<Token, bool> predicate, Func<Token, Token, Node> createNode)
-                => this.error;
-
-            Node IProduction1.Accept(Func<Token, bool> predicate, Func<Token, Token, Node> createNode)
-            {
-                throw new NotImplementedException();
-            }
-
-            IProduction2 IProduction1.Accept(Func<Token, bool> predicate)
-            {
-                throw new NotImplementedException();
-            }
-
-            Node IProduction1.Expect(Func<Token, bool> predicate, Func<Token, Token, Node> createNode)
-            {
-                throw new NotImplementedException();
-            }
-
-            IProduction2 IProduction1.Expect(Func<Token, bool> predicate)
-            {
-                throw new NotImplementedException();
-            }
-        }
     }
 }
