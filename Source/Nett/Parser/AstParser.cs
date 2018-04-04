@@ -19,36 +19,39 @@ namespace Nett.Parser
 
             if (this.input.Eos) { return TomlNode.Empty(); }
 
-            var expressions = new List<Node>();
+            var expressions = new List<ExpressionNode>();
 
-            var exp = this.Expression();
+            var exp = this.Expression().Node;
             expressions.Add(exp);
             //this.NextExpression();
 
             return new TomlNode(expressions);
         }
 
-        private Node Expression()
+        private IReq<ExpressionNode> Expression()
         {
-            return Comment() ?? KeyValueExpression() ?? Table();
+            return Comment().As<ExpressionNode>()
+                .Or(KeyValueExpression())
+                .Or(Table())
+                .Or(this.input.CreateErrorNode());
 
-            Node Comment()
+            IOpt<CommentNode> Comment()
                 => this.input
                     .Accept(t => t.type == TokenType.Comment)
-                    .CreateNode(t => new CommentNode(t));
+                    .CreateNode(t => new CommentNode(t).Opt());
 
-            Node KeyValueExpression()
+            IOpt<KeyValueExpressionNode> KeyValueExpression()
                 => this.input
                     .Accept(t => t.type == TokenType.BareKey)
                     .Expect(t => t.type == TokenType.Assign)
-                    .CreateNode((k, a) => new KeyValueExpressionNode(k, a, this.Value()));
+                    .CreateNode((k, a) => new KeyValueExpressionNode(k, a, this.Value()).Opt());
 
-            Node Table()
+            IOpt<TableNode> Table()
                 => this.input
                     .Accept(t => t.type == TokenType.LBrac)
                     .Expect(t => t.type == TokenType.BareKey)
                     .Expect(t => t.type == TokenType.RBrac)
-                    .CreateNode((_, k, __) => new TableNode(k));
+                    .CreateNode((_, k, __) => new TableNode(k).Opt());
         }
 
         private IEnumerable<ExpressionNode> NextExpression()
@@ -58,66 +61,72 @@ namespace Nett.Parser
             throw new NotImplementedException();
         }
 
-        private Node Value()
+        private IReq<ValueNode> Value()
         {
-            return IntValue()
-                ?? FloatValue()
-                ?? Array()
-                ?? InlineTable()
-                ?? this.input.CreateErrorNode();
+            return IntValue().As<ValueNode>()
+                .Or(FloatValue())
+                .Or(Array())
+                .Or(InlineTable())
+                .Or(this.input.CreateErrorNode());
 
-            Node FloatValue()
+            IOpt<FloatValueNode> FloatValue()
                 => this.input
                     .Accept(t => t.type == TokenType.Float)
-                    .CreateNode(t => new FloatValueNode(t));
+                    .CreateNode(t => new FloatValueNode(t).Opt());
 
-            Node IntValue()
+            IOpt<IntValueNode> IntValue()
                 => this.input
                     .Accept(t => t.type == TokenType.Integer)
-                    .CreateNode(t => new IntValueNode(t));
+                    .CreateNode(t => new IntValueNode(t).Opt());
 
-            Node Array()
+            IOpt<ArrayNode> Array()
                 => this.input
                     .Accept(t => t.type == TokenType.LBrac)
-                    .CreateNode(t => this.Array(t));
+                    .CreateNode(t => this.Array(t).AsOpt());
 
-            Node InlineTable()
+            IOpt<InlineTableNode> InlineTable()
                 => this.input
                     .Accept(t => t.type == TokenType.LCurly)
-                    .CreateNode(_ => this.InlineTable());
+                    .CreateNode(_ => this.InlineTable().AsOpt());
         }
 
-        private Node Array(Token lbrac)
+        private IReq<ArrayNode> Array(Token lbrac)
         {
-            var eps = Epsilon();
-            if (eps != null) { return eps; }
-
-            Node value = this.Value();
-            Node separator = this.ArraySeparator();
-
+            var items = this.ArrayItems();
             return this.input.Expect(t => t.type == TokenType.RBrac)
-                .CreateNode(t => ArrayNode.Create(lbrac, t, value, separator));
-
-            Node Epsilon()
-                => this.input
-                    .Accept(t => t.type == TokenType.RBrac)
-                    .CreateNode(t => ArrayNode.Empty(lbrac, t));
+                .CreateNode(t => ArrayNode.Create(lbrac, t, items).Req());
         }
 
-        private Node ArraySeparator()
+        private IOpt<ArrayItemNode> ArrayItems()
         {
-            if (Epsilon()) { return null; }
+            if (Epsilon()) { return Opt<ArrayItemNode>.None; }
 
-            return this.input.Expect(t => t.type == TokenType.Comma)
-                .CreateNode(t => new SymbolNode(t, this.Value()));
+            var value = this.Value();
+            var sep = this.ArraySeparator();
+
+            return new ArrayItemNode(value, sep).Opt();
 
             bool Epsilon()
-                => this.input
-                    .Accept(t => t.type == TokenType.RBrac)
-                    .CreateNode(t => new SymbolNode(t)) != null;
+                => this.input.Peek(t => t.type == TokenType.RBrac);
         }
 
-        private Node InlineTable()
+        private Opt<ArrayItemNode> ArrayItem()
+        {
+            throw new NotImplementedException();
+        }
+
+        private IOpt<ArraySeparatorNode> ArraySeparator()
+        {
+            if (Epsilon()) { return Opt<ArraySeparatorNode>.None; }
+
+            return this.input.Expect(t => t.type == TokenType.Comma)
+                .CreateNode(t => new ArraySeparatorNode(t, this.ArrayItem()).Opt());
+
+            bool Epsilon()
+                => this.input.Peek(t => t.type == TokenType.RBrac);
+        }
+
+        private IReq<InlineTableNode> InlineTable()
         {
             throw new NotImplementedException();
         }

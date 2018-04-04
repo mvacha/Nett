@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Nett.Collections;
 
@@ -35,5 +36,11 @@ namespace Nett.Parser.Ast
 
             return builder.ToString();
         }
+
+        protected static IEnumerable<Node> NodesAsEnumerable(params IReq<Node>[] nodes)
+            => nodes.Select(n => (Node)n);
+
+        protected static IEnumerable<Node> NonNullNodesAsEnumerable(params INode<Node>[] nodes)
+            => nodes.Select(n => (Node)n).Where(n => n != null);
     }
 }

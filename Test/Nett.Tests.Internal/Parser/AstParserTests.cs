@@ -37,6 +37,84 @@ T
         }
 
         [Fact]
+        public void Parse_EmptyArrayValue_CreatesCorrectAst()
+        {
+            // Act
+            var parsed = Parse("x = []");
+
+            // Assert
+            parsed.PrintTree().Trim().Should().Be(@"
+T
+ E -> k=V
+  k -> x
+  s -> =
+  A
+   s -> [
+   s -> ]
+".Trim());
+        }
+
+        [Fact]
+        public void Parse_ArrayValueWithValue_CreatesCorrectAst()
+        {
+            // Act
+            var parsed = Parse("x = [100]");
+
+            // Assert
+            parsed.PrintTree().Trim().Should().Be(@"
+T
+ E -> k=V
+  k -> x
+  s -> =
+  A
+   s -> [
+   V -> 100
+   s -> ]
+".Trim());
+        }
+
+        [Fact]
+        public void Parse_ArrayWithFinalSeparator_CreatesCorrectAst()
+        {
+            // Act
+            var parsed = Parse("x = [100,]");
+
+            // Assert
+            parsed.PrintTree().Trim().Should().Be(@"
+T
+ E -> k=V
+  k -> x
+  s -> =
+  A
+   s -> [
+   V -> 100
+   s -> ,
+   s -> ]
+".Trim());
+        }
+
+        [Fact]
+        public void Parse_ArrayWithSecondValue_CreatesCorrectAst()
+        {
+            // Act
+            var parsed = Parse("x = [100,200]");
+
+            // Assert
+            parsed.PrintTree().Trim().Should().Be(@"
+T
+ E -> k=V
+  k -> x
+  s -> =
+  A
+   s -> [
+   V -> 100
+   s -> ,
+    V -> 200
+   s -> ]
+".Trim());
+        }
+
+        [Fact]
         public void Parse_SingleKey_CreateSyntaxErrorNode()
         {
             // Act
@@ -64,6 +142,8 @@ T
   X
 ".Trim());
         }
+
+
 
         private static Node Parse(string input)
         {

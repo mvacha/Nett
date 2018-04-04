@@ -4,26 +4,21 @@ namespace Nett.Parser.Ast
 {
     internal sealed class KeyValueExpressionNode : ExpressionNode
     {
-        public KeyValueExpressionNode(Token key, Token assignment, Node value)
+        public KeyValueExpressionNode(Token key, Token assignment, IReq<ValueNode> value)
         {
-            this.Key = new KeyNode(key);
-            this.Assignment = new SymbolNode(assignment);
-            this.Value = new NodeSlot<ValueNode>(value);
+            this.Key = new KeyNode(key).Req();
+            this.Assignment = new SymbolNode(assignment).Req();
+            this.Value = value;
         }
 
-        public KeyNode Key { get; }
+        public IReq<KeyNode> Key { get; }
 
-        public SymbolNode Assignment { get; }
+        public IReq<SymbolNode> Assignment { get; }
 
-        public NodeSlot<ValueNode> Value { get; }
+        public IReq<ValueNode> Value { get; }
 
         public override IEnumerable<Node> Children
-            => new Node[]
-            {
-                this.Key,
-                this.Assignment,
-                this.Value.Slot,
-            };
+            => NodesAsEnumerable(this.Key, this.Assignment, this.Value);
 
         public override string ToString()
             => $"E -> k=V";

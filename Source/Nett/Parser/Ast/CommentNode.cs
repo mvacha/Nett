@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Nett.Parser.Ast
 {
-    internal sealed class CommentNode : Node
+    internal sealed class CommentNode : ExpressionNode
     {
         public CommentNode(Token comment)
         {

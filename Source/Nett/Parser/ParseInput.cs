@@ -42,6 +42,9 @@ namespace Nett.Parser
             return production.Expect(predicate);
         }
 
+        public bool Peek(Func<Token, bool> predicate)
+            => predicate(this.CurrentToken);
+
         public bool ExpectNewlines()
         {
             throw new NotImplementedException();

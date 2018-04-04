@@ -14,7 +14,11 @@ namespace Nett.Parser
 
         internal interface IProduction1
         {
-            Node CreateNode(Func<Token, Node> onSuccess, Func<SyntaxErrorNode> onError = null);
+            IReq<T> CreateNode<T>(Func<Token, IReq<T>> onSuccess, Func<SyntaxErrorNode> onError = null)
+                where T : Node;
+
+            IOpt<T> CreateNode<T>(Func<Token, IOpt<T>> onSuccess, Func<SyntaxErrorNode> onError = null)
+                where T : Node;
 
             IProduction2 Accept(Func<Token, bool> predicate);
 
@@ -23,7 +27,11 @@ namespace Nett.Parser
 
         internal interface IProduction2
         {
-            Node CreateNode(Func<Token, Token, Node> onSuccess, Func<SyntaxErrorNode> onError = null);
+            IReq<T> CreateNode<T>(Func<Token, Token, IReq<T>> onSuccess, Func<SyntaxErrorNode> onError = null)
+                where T : Node;
+
+            IOpt<T> CreateNode<T>(Func<Token, Token, IOpt<T>> onSuccess, Func<SyntaxErrorNode> onError = null)
+                where T : Node;
 
             IProduction3 Accept(Func<Token, bool> predicate);
 
@@ -32,7 +40,11 @@ namespace Nett.Parser
 
         internal interface IProduction3
         {
-            Node CreateNode(Func<Token, Token, Token, Node> onSuccess, Func<SyntaxErrorNode> onError = null);
+            IOpt<T> CreateNode<T>(Func<Token, Token, Token, IOpt<T>> onSuccess, Func<SyntaxErrorNode> onError = null)
+                where T : Node;
+
+            IReq<T> CreateNode<T>(Func<Token, Token, Token, IReq<T>> onSuccess, Func<SyntaxErrorNode> onError = null)
+                where T : Node;
         }
     }
 }

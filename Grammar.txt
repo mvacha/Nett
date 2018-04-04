@@ -5,10 +5,10 @@ R -> n X                    first(R) = {n, eps}             follow(R) = {$}
 X -> E R | eps
 E -> c | [k] | k=V          first(E) = {c, [, k}            follow(E) = {c, eps, $}
 V -> v | [A] | {I}          first(V) = {v, [, {}            follow(V) = {n}
-A -> AI | eps                                               follow(A) = {]}
-AI ->  V AS                                                 follow(AI) = {], ','}
-AS -> , NV | eps
-NV -> AI | eps
+A -> A']                                                follow(A) = {]}
+A' -> AI | eps
+AI ->  V AS | eps                                           follow(AI) = {], ','}
+AS -> , AI | eps                                            follow(AS) = {]}
 
 
 

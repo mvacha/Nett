@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Nett.Parser.Ast
 {
-    internal sealed class TableNode : Node
+    internal sealed class TableNode : ExpressionNode
     {
         public TableNode(Token key)
         {

@@ -59,7 +59,10 @@ namespace Nett.Parser
                     onFail: this.CreateError);
 
             // IProduction1
-            Node IProduction1.CreateNode(Func<Token, Node> onSuccess, Func<SyntaxErrorNode> _)
+            IReq<T> IProduction1.CreateNode<T>(Func<Token, IReq<T>> onSuccess, Func<SyntaxErrorNode> _)
+                => onSuccess(this.token1);
+
+            IOpt<T> IProduction1.CreateNode<T>(Func<Token, IOpt<T>> onSuccess, Func<SyntaxErrorNode> onError)
                 => onSuccess(this.token1);
 
             IProduction2 IProduction1.Accept(Func<Token, bool> predicate)
@@ -75,7 +78,10 @@ namespace Nett.Parser
                     onFail: this.CreateError);
 
             // IProduction2
-            Node IProduction2.CreateNode(Func<Token, Token, Node> onSuccess, Func<SyntaxErrorNode> _)
+            IReq<T> IProduction2.CreateNode<T>(Func<Token, Token, IReq<T>> onSuccess, Func<SyntaxErrorNode> _)
+                => onSuccess(this.token1, this.token2);
+
+            IOpt<T> IProduction2.CreateNode<T>(Func<Token, Token, IOpt<T>> onSuccess, Func<SyntaxErrorNode> _)
                 => onSuccess(this.token1, this.token2);
 
             IProduction3 IProduction2.Accept(Func<Token, bool> predicate)
@@ -91,7 +97,10 @@ namespace Nett.Parser
                     onFail: this.CreateError);
 
             // IProduction3
-            Node IProduction3.CreateNode(Func<Token, Token, Token, Node> onSuccess, Func<SyntaxErrorNode> _)
+            IReq<T> IProduction3.CreateNode<T>(Func<Token, Token, Token, IReq<T>> onSuccess, Func<SyntaxErrorNode> _)
+                => onSuccess(this.token1, this.token2, this.token3);
+
+            IOpt<T> IProduction3.CreateNode<T>(Func<Token, Token, Token, IOpt<T>> onSuccess, Func<SyntaxErrorNode> _)
                 => onSuccess(this.token1, this.token2, this.token3);
 
             private IProduction1 ApplyToken1(Token t)

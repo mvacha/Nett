@@ -23,11 +23,23 @@ namespace Nett.Parser
             IProduction2 IProduction1.Accept(Func<Token, bool> predicate)
                 => this;
 
-            Node IProduction1.CreateNode(Func<Token, Node> onSuccess, Func<SyntaxErrorNode> onError)
-                => null;
+            IReq<T> IProduction1.CreateNode<T>(Func<Token, IReq<T>> onSuccess, Func<SyntaxErrorNode> onError)
+                => new Req<T>(null);
 
-            Node IProduction3.CreateNode(Func<Token, Token, Token, Node> onSuccess, Func<SyntaxErrorNode> onError)
-                => null;
+            IOpt<T> IProduction1.CreateNode<T>(Func<Token, IOpt<T>> onSuccess, Func<SyntaxErrorNode> onError)
+                => new Opt<T>(null);
+
+            IReq<T> IProduction2.CreateNode<T>(Func<Token, Token, IReq<T>> onSuccess, Func<SyntaxErrorNode> onError = null)
+                => new Req<T>(null);
+
+            IOpt<T> IProduction2.CreateNode<T>(Func<Token, Token, IOpt<T>> onSuccess, Func<SyntaxErrorNode> onError = null)
+                => new Opt<T>(null);
+
+            IReq<T> IProduction3.CreateNode<T>(Func<Token, Token, Token, IReq<T>> onSuccess, Func<SyntaxErrorNode> onError)
+                => new Req<T>(null);
+
+            IOpt<T> IProduction3.CreateNode<T>(Func<Token, Token, Token, IOpt<T>> onSuccess, Func<SyntaxErrorNode> onError)
+                => new Opt<T>(null);
 
             IProduction2 IProduction1.Expect(Func<Token, bool> predicate)
                 => this;

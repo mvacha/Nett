@@ -4,40 +4,34 @@ namespace Nett.Parser.Ast
 {
     internal sealed class ArrayNode : ValueNode
     {
-        private ArrayNode(Node lbrac, Node rbrac)
-            : this(lbrac, rbrac, null, null)
+        private ArrayNode(IReq<SymbolNode> lbrac, IReq<SymbolNode> rbrac)
+            : this(lbrac, rbrac, AstNode.None<ArrayItemNode>())
         {
         }
 
-        private ArrayNode(Node lbrac, Node rbrac, Node value, Node separator)
+        private ArrayNode(IReq<SymbolNode> lbrac, IReq<SymbolNode> rbrac, IOpt<ArrayItemNode> item)
         {
-            this.LBrac = (SymbolNode)lbrac;
-            this.RBrac = (SymbolNode)rbrac;
-            this.Value = (ValueNode)value;
-            this.Separator = (SymbolNode)separator;
+            this.LBrac = lbrac;
+            this.RBrac = rbrac;
+            this.Item = item;
         }
 
-        public static ArrayNode Empty(Token lbrac, Token rbrac)
-            => new ArrayNode(new SymbolNode(lbrac), new SymbolNode(rbrac));
+        public IReq<SymbolNode> LBrac { get; }
 
-        public static ArrayNode Create(Token lbrac, Token rbrac, Node value, Node separator)
-            => new ArrayNode(new SymbolNode(lbrac), new SymbolNode(rbrac), value, separator);
+        public IReq<SymbolNode> RBrac { get; }
 
-        public SymbolNode LBrac { get; }
-
-        public SymbolNode RBrac { get; }
-
-        public ValueNode Value { get; }
-
-        public SymbolNode Separator { get; }
+        public IOpt<ArrayItemNode> Item { get; }
 
         public override IEnumerable<Node> Children
-        {
-            get
-            {
-                yield return this.Value;
-                yield return this.Separator;
-            }
-        }
+            => NonNullNodesAsEnumerable(this.LBrac, this.Item, this.RBrac);
+
+        public static ArrayNode Empty(Token lbrac, Token rbrac)
+            => new ArrayNode(AstNode.Required(new SymbolNode(lbrac)), AstNode.Required(new SymbolNode(rbrac)));
+
+        public static ArrayNode Create(Token lbrac, Token rbrac, IOpt<ArrayItemNode> item)
+            => new ArrayNode(new SymbolNode(lbrac).Req(), new SymbolNode(rbrac).Req(), item);
+
+        public override string ToString()
+            => "A";
     }
 }
