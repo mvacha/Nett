@@ -13,6 +13,8 @@
         {
             ITypeSettingsBuilder<TCustom> CreateInstance(Func<TCustom> func);
 
+            ITypeSettingsBuilder<TCustom> CreateInstance(Func<TomlTable, TCustom> func);
+
             ITypeSettingsBuilder<TCustom> IgnoreProperty<TProperty>(Expression<Func<TCustom, TProperty>> accessor);
 
             ITypeSettingsBuilder<TCustom> TreatAsInlineTable();
@@ -179,7 +181,13 @@
 
             public ITypeSettingsBuilder<TCustom> CreateInstance(Func<TCustom> activator)
             {
-                this.settings.activators.Add(typeof(TCustom), () => activator());
+                this.settings.activators.Add(typeof(TCustom), _ => activator());
+                return this;
+            }
+
+            public ITypeSettingsBuilder<TCustom> CreateInstance(Func<TomlTable, TCustom> activator)
+            {
+                this.settings.activators.Add(typeof(TCustom), tomlTable => activator(tomlTable));
                 return this;
             }
 

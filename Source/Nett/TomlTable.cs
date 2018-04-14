@@ -171,7 +171,7 @@
         {
             if (t == Types.TomlTableType) { return this; }
 
-            var result = this.Root.Settings.GetActivatedInstance(t);
+            var result = this.Root.Settings.GetActivatedInstance(t, this);
 
             var conv = this.Root.Settings.TryGetConverter(Types.TomlTableType, t);
             if (conv != null)

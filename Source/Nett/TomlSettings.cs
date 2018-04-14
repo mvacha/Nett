@@ -19,7 +19,7 @@
 
         private const BindingFlags PropBindingFlags = BindingFlags.Public | BindingFlags.Instance;
 
-        private readonly Dictionary<Type, Func<object>> activators = new Dictionary<Type, Func<object>>();
+        private readonly Dictionary<Type, Func<TomlTable, object>> activators = new Dictionary<Type, Func<TomlTable, object>>();
         private readonly ConverterCollection converters = new ConverterCollection();
         private readonly HashSet<Type> inlineTableTypes = new HashSet<Type>();
         private readonly Dictionary<string, Type> tableKeyToTypeMappings = new Dictionary<string, Type>();
@@ -42,12 +42,11 @@
             return config;
         }
 
-        internal object GetActivatedInstance(Type t)
+        internal object GetActivatedInstance(Type t, TomlTable tomlTable)
         {
-            Func<object> a;
-            if (this.activators.TryGetValue(t, out a))
+            if (this.activators.TryGetValue(t, out var a))
             {
-                return a();
+                return a(tomlTable);
             }
             else
             {
