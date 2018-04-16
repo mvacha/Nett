@@ -101,7 +101,8 @@
             var shouldThrowForUnknown = this.throwForUnknownProps.TryGetValue(t, out var shouldThrow);
             shouldThrowForUnknown &= shouldThrow; //if key exist and is true
 
-            if (pi == null && shouldThrowForUnknown)
+            // Throw (when set) for filled out properties that are either missing or ignored
+            if ((pi == null || this.IsPropertyIgnored(t, pi)) && shouldThrowForUnknown)
             {
                 throw new InvalidOperationException($"Unknown property with name: {key}");
             }
