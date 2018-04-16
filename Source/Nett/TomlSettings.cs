@@ -24,6 +24,7 @@
         private readonly HashSet<Type> inlineTableTypes = new HashSet<Type>();
         private readonly Dictionary<string, Type> tableKeyToTypeMappings = new Dictionary<string, Type>();
         private readonly Dictionary<Type, HashSet<string>> ignoredProperties = new Dictionary<Type, HashSet<string>>();
+        private readonly Dictionary<Type, bool> throwForUnknownProps = new Dictionary<Type, bool>();
 
         private TomlCommentLocation defaultCommentLocation = TomlCommentLocation.Prepend;
 
@@ -96,7 +97,23 @@
         internal PropertyInfo TryGetMappingProperty(Type t, string key)
         {
             var pi = t.GetProperty(key, PropBindingFlags);
-            return pi != null && !this.IsPropertyIgnored(t, pi) ? pi : null;
+
+            var shouldThrowForUnknown = this.throwForUnknownProps.TryGetValue(t, out var shouldThrow);
+            shouldThrowForUnknown &= shouldThrow; //if key exist and is true
+
+            if (pi == null && shouldThrowForUnknown)
+            {
+                throw new InvalidOperationException($"Unknown property with name: {key}");
+            }
+
+            if (pi != null && !this.IsPropertyIgnored(t, pi) && pi.GetSetMethod() != null)
+            {
+                return pi;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         internal ITomlConverter TryGetConverter(Type from, Type to) =>

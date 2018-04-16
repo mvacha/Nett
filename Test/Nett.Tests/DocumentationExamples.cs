@@ -34,7 +34,8 @@ namespace Nett.Tests
     [ExcludeFromCodeCoverage]
     public class Client
     {
-        public string ServerAddress { get; set; }
+        public string ServerAddress { get; }
+        public Client(string serverAddress) => ServerAddress = serverAddress;
     }
 
     [ExcludeFromCodeCoverage]
@@ -83,6 +84,12 @@ ServerAddress = ""http://127.0.0.1:8080""
 
 ";
 
+        private string exp2 = @"[Server]
+Timeout = 1m
+IPAddr = ""10.1.1.2""
+
+";
+
         private string NewFileName() => Guid.NewGuid() + ".toml";
 
         private void WriteTomlFile(string fileName)
@@ -91,7 +98,7 @@ ServerAddress = ""http://127.0.0.1:8080""
             {
                 EnableDebug = true,
                 Server = new Server() { Timeout = TimeSpan.FromMinutes(1) },
-                Client = new Client() { ServerAddress = "http://127.0.0.1:8080" },
+                Client = new Client("http://127.0.0.1:8080"),
             };
 
             Toml.WriteFile(config, fileName);
@@ -118,11 +125,34 @@ ServerAddress = ""http://127.0.0.1:8080""
             string fn = this.NewFileName();
             this.WriteTomlFile(fn);
 
-            var config = Toml.ReadFile<Configuration>(fn);
+            var settings = TomlSettings.Create(ts => ts.ConfigureType<Client>(cs =>
+                cs.CreateInstance(tompTable => new Client(tompTable.Get<string>(nameof(Client.ServerAddress))))            
+            ));
+
+            var config = Toml.ReadFile<Configuration>(fn, settings);
 
             config.EnableDebug.Should().Be(true);
             config.Client.ServerAddress.Should().Be("http://127.0.0.1:8080");
             config.Server.Timeout.Should().Be(TimeSpan.FromMinutes(1));
+
+            
+        }
+
+        [Fact]
+        public void ShouldThrowOnUnknownProps()
+        {
+            var settings = TomlSettings.Create(ts => 
+                ts.ConfigureType<Client>(cs => cs.ThrowForUnknownProps()));
+
+            Action readClient = () => Toml.ReadString<Client>(exp2, settings);
+            readClient.ShouldThrow<InvalidOperationException>();
+        }
+
+        [Fact]
+        public void ShouldNotThrowOnUnknownProps()
+        {
+            Action readClient = () => Toml.ReadString<Client>(exp2);
+            readClient.ShouldNotThrow();
         }
 
         [Fact]

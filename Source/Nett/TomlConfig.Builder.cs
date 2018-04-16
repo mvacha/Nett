@@ -19,6 +19,8 @@
 
             ITypeSettingsBuilder<TCustom> TreatAsInlineTable();
 
+            ITypeSettingsBuilder<TCustom> ThrowForUnknownProps();
+
             ITypeSettingsBuilder<TCustom> WithConversionFor<TToml>(Action<IConversionSettingsBuilder<TCustom, TToml>> conv)
                 where TToml : TomlObject;
         }
@@ -202,6 +204,12 @@
             public ITypeSettingsBuilder<TCustom> TreatAsInlineTable()
             {
                 this.settings.inlineTableTypes.Add(typeof(TCustom));
+                return this;
+            }
+
+            public ITypeSettingsBuilder<TCustom> ThrowForUnknownProps()
+            {
+                this.settings.throwForUnknownProps.Add(typeof(TCustom), true);
                 return this;
             }
 
