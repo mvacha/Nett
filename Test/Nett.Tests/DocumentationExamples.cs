@@ -39,6 +39,13 @@ namespace Nett.Tests
     }
 
     [ExcludeFromCodeCoverage]
+    public class Server2
+    {
+        [TomlIgnore]
+        public string IPAddr { get; set; }
+    }
+
+    [ExcludeFromCodeCoverage]
     public struct Money
     {
         public string Currency { get; set; }
@@ -84,11 +91,6 @@ ServerAddress = ""http://127.0.0.1:8080""
 
 ";
 
-        private string exp2 = @"[Server]
-Timeout = 1m
-IPAddr = ""10.1.1.2""
-
-";
 
         private string NewFileName() => Guid.NewGuid() + ".toml";
 
@@ -141,17 +143,48 @@ IPAddr = ""10.1.1.2""
         [Fact]
         public void ShouldThrowOnUnknownProps()
         {
-            var settings = TomlSettings.Create(ts => 
-                ts.ConfigureType<Client>(cs => cs.ThrowForUnknownProps()));
+            var serverWithExtraProp = @"Timeout = 1m
+IPAddr = ""10.1.1.2""
+";
+            var settings = TomlSettings.Create(ts =>
+                    ts.ConfigureType<Server>(cs => cs.ThrowForUnknownProps()));
 
-            Action readClient = () => Toml.ReadString<Client>(exp2, settings);
-            readClient.ShouldThrow<InvalidOperationException>();
+            Action readClient = () => Toml.ReadString<Server>(serverWithExtraProp, settings);
+            readClient.ShouldThrow<InvalidOperationException>()
+                .And.Message.Should().Be("Unknown property with name: IPAddr");
+
         }
 
         [Fact]
         public void ShouldNotThrowOnUnknownProps()
         {
-            Action readClient = () => Toml.ReadString<Client>(exp2);
+            var serverWithExtraProp = @"Timeout = 1m
+IPAddr = ""10.1.1.2""
+";
+
+            Action readClient = () => Toml.ReadString<Server>(serverWithExtraProp);
+            readClient.ShouldNotThrow();
+        }
+
+        [Fact]
+        public void ShouldThrowOnUnknownIgnoredProps()
+        {
+            var serverWithExtraProp = @"IPAddr = ""10.1.1.2""";
+
+            var settings = TomlSettings.Create(ts =>
+                ts.ConfigureType<Server2>(cs => cs.ThrowForUnknownProps()));
+
+            Action readClient = () => Toml.ReadString<Server2>(serverWithExtraProp, settings);
+            readClient.ShouldThrow<InvalidOperationException>()
+                .And.Message.Should().Be("Unknown property with name: IPAddr");
+        }
+
+        [Fact]
+        public void ShouldNotThrowOnUnIgnoredProps()
+        {
+            var serverWithExtraProp = @"IPAddr = ""10.1.1.2""";
+
+            Action readClient = () => Toml.ReadString<Server>(serverWithExtraProp);
             readClient.ShouldNotThrow();
         }
 
